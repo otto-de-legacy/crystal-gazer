@@ -12,6 +12,6 @@ Each line is one article history ordered via time.
 the json file produced can be viewed via a chrome browser:
     chrome://tracing
 
-## questions 
+## questions
 
     
