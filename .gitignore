@@ -1,0 +1,15 @@
+.idea
+__pycache__
+*.swp
+*.pyc
+*.xcf
+*.aux
+*.brf
+*.idx
+*.log
+*.out  
+*.toc
+*.auxlog
+/data/part-00000
+output/*
+/core/resources_full/*
