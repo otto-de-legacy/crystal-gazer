@@ -1,13 +1,8 @@
-import random
 from unittest import TestCase
-import tensorflow as tf
-import core.network as nw
-import core.trainer as tn
-from core.config import Config
-import core.url_mapper as um
-from core.data_sampler import DataSampler
+
 import numpy as np
 
+from core.data_sampler import DataSampler
 
 
 class TestNetwork(TestCase):
@@ -22,5 +17,4 @@ class TestNetwork(TestCase):
         np.random.seed(0)
         rs = DataSampler(np.arange(0, 100, 1), np.array([0.01] * 100), 10)
         res = rs.get_by_condition(lambda x: x > 80)
-
         np.testing.assert_array_equal(res, np.arange(81, 100, 1), err_msg="check bucket sizes")

@@ -1,34 +1,38 @@
 # -*- coding: utf-8 -*-
-import numpy as np
-import tensorflow as tf
 import random
+
+import numpy as np
+
 from core.data_sampler import DataSampler
 from core.event import Event
-from scipy import stats
-import core.url_mapper as um
-import time
 
 
 class Loader(object):
-    def __init__(self, config, in_data_text, url_mapper):
+    def __init__(self, config, in_data_text, interaction_mapper):
         self.cf = config
         self.random_generator, self.tot_event_cnt, self.unique_train_event_cnt = self._prepare_events(
             in_data_text.replace(" ", ""))
-        self.um = url_mapper
+        self.um = interaction_mapper
         self.epoch_cnt = 0
         self.batche_cnt = 0
         self.event_cnt = 0
         self.new_epoch = True
 
     def _user_journey_to_events(self, journey_string):
-        urls = journey_string.split(",")
+        """journey_string needs to be comma separated integers, i.e., 15,35,37,38,..."""
+        user_interaction = journey_string.split(",")
         events = []
-        for i in range(len(urls) - 1):
-            url = urls[i]
-            url_plus_one = urls[i + 1]
-            f_idx = int(url)
-            t_idx = int(url_plus_one)
-            events.append(Event(f_idx, t_idx))
+        for i in range(len(user_interaction) - 1):
+            interaction = user_interaction[i]
+            f_idx = int(interaction)
+
+            for n in range(self.cf.neighboring_interactions+1):
+                if n+i > len(user_interaction)-1:
+                     break
+                interaction_plus_n = user_interaction[i + n]
+                t_idx = int(interaction_plus_n)
+                if f_idx is not t_idx:
+                    events.append(Event(f_idx, t_idx))
         return events
 
     def _prepare_events(self, text_content):
@@ -87,7 +91,7 @@ class Loader(object):
         real_batch_events = self.get_random_events(real_batch_size)
         fake_batch_events = self.get_random_events(fake_batch_size)
 
-        fake_batch_events_clone = [Event(e.feature_idx, random.randint(0, self.um.total_url_cnt)) for e in fake_batch_events]
+        fake_batch_events_clone = [Event(e.feature_idx, random.randint(0, self.um.total_interaction_cnt)) for e in fake_batch_events]
 
         full_events = np.concatenate((real_batch_events, fake_batch_events_clone), axis=0)
 
@@ -126,9 +130,9 @@ class Loader(object):
         top_bucket_info = top_bucket_info + """----------------------------------------------------
             """
         for e in top_bucket["bucket_events"][0:20]:
-            top_bucket_info = top_bucket_info + "feature: " + self.um.num_to_url(e.feature_idx) + """
+            top_bucket_info = top_bucket_info + "feature: " + self.um.num_to_interaction(e.feature_idx) + """
             """
-            top_bucket_info = top_bucket_info + "target: " + self.um.num_to_url(e.label_idx) + """
+            top_bucket_info = top_bucket_info + "target: " + self.um.num_to_interaction(e.label_idx) + """
             """
             top_bucket_info = top_bucket_info + "occurence count: " + str(e.count) + """
             """

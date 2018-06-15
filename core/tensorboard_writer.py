@@ -4,7 +4,7 @@ import tensorflow as tf
 import random
 from scipy import stats
 import os
-import core.url_mapper as um
+import core.interaction_mapper as um
 from multiprocessing import Process
 
 

@@ -1,17 +1,20 @@
 from unittest import TestCase
+
 import tensorflow as tf
-from core.network import Network
+
+import core.interaction_mapper as um
 from core.config import Config
-import core.url_mapper as um
+from core.network import Network
+
 
 class TestNetwork(TestCase):
     def test_layer_sizes(self):
         cf = Config()
         cf.embedding_size = 3
-        url_map = um.UrlMapper()
-        test_netowrk = Network(cf, url_map)
+        interaction_map = um.InteractionMapper()
+        test_netowrk = Network(cf, interaction_map)
 
-        input_to_layer = tf.sparse_placeholder(tf.float32, shape=[None, url_map.url_class_cnt], name="url_feature")
+        input_to_layer = tf.sparse_placeholder(tf.float32, shape=[None, interaction_map.interaction_class_cnt], name="interaction_feature")
         out_layer = test_netowrk.predict(input_to_layer)
         out_layer_shape = out_layer.get_shape().as_list()
-        self.assertTrue(out_layer_shape == [None, cf.embedding_size], msg="")
+        self.assertTrue(out_layer_shape == [None, cf.embedding_size], msg="layer shape")

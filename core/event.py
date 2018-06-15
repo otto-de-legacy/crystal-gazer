@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-import numpy as np
-import tensorflow as tf
-import random
-from core.data_sampler import DataSampler
-from scipy import stats
-import core.url_mapper as um
-import time
 
 
 class Event():

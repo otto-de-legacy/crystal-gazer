@@ -1,20 +1,20 @@
 import time
 
 import tensorflow as tf
-from tensorflow.python.client import timeline
 
 import core.loader as ld
 from core.config import Config
+from core.interaction_index import InteractionIndex
+from core.interaction_mapper import InteractionMapper
 from core.metric_profiler import MetricProfiler
 from core.network import Network
 from core.tensorboard_writer import TensorboardWriter
 from core.trainer import Trainer
-from core.url_index import UrlIndex
-from core.url_mapper import UrlMapper
 
-cf = Config(short=False)
+cf = Config(short=True)
+cf.make_dirs()
 tbw = TensorboardWriter(cf)
-um = UrlMapper(cf)
+um = InteractionMapper(cf)
 
 with open(cf.url_train_data, 'r') as f:
     txt = str(f.read())
@@ -30,7 +30,7 @@ mp = False
 x_label = None
 
 log_txt = "Config: " + cf.to_string() + "\n\n" + \
-          "Url mapper: " + um.to_string() + "\n\n" + \
+          "Interaction mapper: " + um.to_string() + "\n\n" + \
           "Train Loader @start: " + train_loader.to_string() + "\n\n" + \
           "Test Loader @start: " + test_loader.to_string()
 
@@ -66,11 +66,11 @@ with tf.Session() as sess:
             tbw.flush()
             print("epochs: " + str(train_loader.epoch_cnt))
 
-            ui = UrlIndex(cf, um, trainer.get_url_embeddings(sess))
+            ui = InteractionIndex(cf, um, trainer.get_interaction_embeddings(sess))
             mp = MetricProfiler(cf, sess, tbw, train_loader, um, ui)
             mp.log_plots(x_label)
 
-    mp.log_url_results()
+    mp.log_results()
     with open(cf.timeline_profile_path, 'w') as f:
         f.write(trainer.chrome_trace())
 

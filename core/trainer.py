@@ -1,6 +1,4 @@
 import tensorflow as tf
-import numpy as np
-from tensorflow.python.ops.losses.losses_impl import Reduction
 from tensorflow.python.client import timeline
 
 class Trainer(object):
@@ -20,16 +18,16 @@ class Trainer(object):
 
     def _initialize_graph(self):
         """build graph"""
-        self.x = tf.sparse_placeholder(tf.float32, shape=[None, self.network.um.url_class_cnt], name="url_feature")
-        self.y = tf.sparse_placeholder(tf.float32, shape=[None, self.network.um.url_class_cnt], name="url_label")
+        self.x = tf.sparse_placeholder(tf.float32, shape=[None, self.network.im.interaction_class_cnt], name="interaction_feature")
+        self.y = tf.sparse_placeholder(tf.float32, shape=[None, self.network.im.interaction_class_cnt], name="interaction_label")
         self.d = tf.placeholder(tf.float32, shape=[None], name="expected_dist")  # for mixing with falsy predictions
 
-        self.url_vectors = self.network.embedd_url_sparse_tensor(self.x)
+        self.interaction_vectors = self.network.embedd_interaction_sparse_tensor(self.x)
         self.pred = self.network.predict(self.x)
         self.cost = self._loss_(
-            self.url_vectors,
+            self.interaction_vectors,
             self.pred,
-            self.network.embedd_url_sparse_tensor(self.y),
+            self.network.embedd_interaction_sparse_tensor(self.y),
             self.d
         )
 
@@ -50,18 +48,18 @@ class Trainer(object):
     def _single_loss_(self, single_dist, exp_dist):
         return tf.pow(single_dist - exp_dist, 2)
 
-    def _loss_(self, url_vectors, prediction, target, exp_dist):
+    def _loss_(self, interaction_vectors, prediction, target, exp_dist):
         single_loss = self._single_loss_(self._single_dist_(prediction, target), exp_dist)
 
-        norm = tf.norm(url_vectors, axis=1)
+        norm = tf.norm(interaction_vectors, axis=1)
         norm_minus_one = tf.pow(norm - tf.ones_like(norm, tf.float32), 2)
-        self.url_vector_norm_renormalization_condition = tf.reduce_mean(norm_minus_one)
+        self.interaction_vector_norm_renormalization_condition = tf.reduce_mean(norm_minus_one)
 
-        return tf.reduce_mean(single_loss) + self.url_vector_norm_renormalization_condition
+        return tf.reduce_mean(single_loss) + self.interaction_vector_norm_renormalization_condition
 
     def train(self, sess, batch_x, batch_y, exp_dist):
 
-        self.train_output = sess.run([self.optimizer, self.merged],  # , self.url_vector_norm_renormalization_condition
+        self.train_output = sess.run([self.optimizer, self.merged],  # , self.interaction_vector_norm_renormalization_condition
                                      run_metadata=self.run_metadata,
                                      feed_dict={self.x: batch_x,
                                                 self.y: batch_y,
@@ -78,17 +76,17 @@ class Trainer(object):
         return ctf
 
     def test(self, sess, batch_x, batch_y, exp_dist):
-        self.test_output = sess.run([self.merged, self.cost],  # , self.url_vector_norm_renormalization_condition
+        self.test_output = sess.run([self.merged, self.cost],  # , self.interaction_vector_norm_renormalization_condition
                                     feed_dict={self.x: batch_x,
                                                self.y: batch_y,
                                                self.d: exp_dist})
         print("test cost: " + str(self.test_output[1]))
         return self.test_output[0]
 
-    def get_url_embeddings(self, sess):
-        tot_urls = self.network.um.total_url_cnt
-        url_sparse_vectors = self.network.um.idxs_to_tf(range(tot_urls))
-        return sess.run(self.network.embedd_url_sparse_tensor(self.x), feed_dict={self.x: url_sparse_vectors})
+    def get_interaction_embeddings(self, sess):
+        tot_interactions = self.network.im.total_interaction_cnt
+        interaction_sparse_vectors = self.network.im.idxs_to_tf(range(tot_interactions))
+        return sess.run(self.network.embedd_interaction_sparse_tensor(self.x), feed_dict={self.x: interaction_sparse_vectors})
 
     def print_info_(self):
         print("--------------------------------------------------------------")

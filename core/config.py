@@ -9,40 +9,39 @@ class Config:
         self.short = short
 
         if short:
-            append = "_small"
+            data_folder = "./resources"
         else:
-            append = ""
+            data_folder = "./resources_full"
 
-        self.embedding_size = 100
+        self.embedding_size = 100  # vector length of user interaction representation
 
-        self.epochs = 20  # number of epochs (epoch = whole train data processed) to train
+        self.epochs = 50  # number of epochs (epoch = whole train data processed) to train
 
-        self.batch_size = 100000
-        self.fake_frac = 0.7
-        self.bucket_count = 10
+        self.batch_size = 100000  # number of events processed in single step in tensorflow
+        self.fake_frac = 0.7  # fraction of generated fake events for triplet loss
+        self.bucket_count = 10  # buckets of the self-made event randomizer
+        self.neighboring_interactions = 4  # distance of user_interactions still considered
 
-        self.learning_rate = 0.001
+        self.learning_rate = 0.001  # learning rate for tensorflow
 
-        self.url_train_data = './resources/train_data' + append
-        self.url_test_data = './resources/test_data' + append
+        self.url_train_data = data_folder + '/train_data'
+        self.url_test_data = data_folder + '/test_data'
 
-        self.url_unique = './resources/unique_urls31mb'
-        self.url_map = './resources/url_map' + append
+        self.interaction_map = data_folder + '/interaction_map'
 
         self.tb_command = "bash -c \"source /home/chambroc/miniconda3/bin/activate crystal && tensorboard --logdir="
 
-        self.print_top_queries_cnt = 10
-        self.result_cnt_plots = 50
-        self.result_cnt_final = 200
-        self.events_from_true_data = 100
-        self.knn_plots = 200
-        self.knn_final = 200
+        # self.print_top_queries_cnt = 10  # for logging
+        self.events_from_true_data = 100  # top events considered from true data when calculating weighted_pos_avg
+        self.knn_plots = 200  # nearest neighbor search for tensorboard plots (weighted_pos_avg)
+        self.result_cnt_plots = 50  # weighted random interactions considered for weighted_pos_avg when plotting
+        self.knn_final = 200  # nearest neighbor search explicit logging  after entire training
+        self.result_cnt_final = 200  # weighted random interactions considered for weighted_pos_avg for final log
 
         self.run_dir = os.getcwd() + "/.././output/run_" + datetime.datetime.now().strftime("%Y_%I_%B_%H:%M:%S")
         self.tb_dir = self.run_dir + "/tensorboard"
-        self.index_safe_path = self.run_dir + "/url_indexing/url_index.txt"
+        self.index_safe_path = self.run_dir + "/interaction_indexing/interaction_index.txt"
         self.timeline_profile_path = self.run_dir + "/timeline_profile/timeline.json"
-        self.make_dirs()
 
     def make_dirs(self):
         os.mkdir(self.run_dir)
@@ -53,7 +52,7 @@ class Config:
         os.mkdir(self.run_dir + "/tensorboard/log")
 
         os.mkdir(self.run_dir + "/timeline_profile")
-        os.mkdir(self.run_dir + "/url_indexing")
+        os.mkdir(self.run_dir + "/interaction_indexing")
 
     def to_string(self):
         ret_string = """

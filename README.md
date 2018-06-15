@@ -1,17 +1,31 @@
-# POC recommender
-Proof of concept of a recommender of time series cathegorical data.
+#POC recommender
+Proof of concept (POC) of a recommender of time series categorical data.
 We use Tensorboard and nmslib for visualization and nearest neighbor queries, respectively.
 
 Pull-requests are welcome.
-## data preparation
+
+
+## prior data preparation
 Prepare data with integer numbers as in test/train_data_small which is used as input.
-Each line is one article history ordered via time.
+Each line is one unser interaction history ordered w.r.t. time.
+
+## overview
+Naming convention:
+* interaction: one single integer in the history given in the data
+* event: one event contains features and targets beside having an occurence count.
+
+We use the data to generate events. 
+The events are sparse one-hot encoded according to the integer given in the data file.
+Thus, make sure, the user interactions are mapped to unique sequential integer values! 
+For the translation, we use a mapping, defined in the interaction_map file for easier interpretation.
+
+
 
 ## profiling
+Some performance metrics are plotted with Tensorboard.
 
-the json file produced can be viewed via a chrome browser:
+The (final) json file produced can be viewed via a chrome browser:
     chrome://tracing
 
-## questions
 
     
