@@ -2,6 +2,8 @@
 Proof of concept (POC) of a recommender of time series categorical data.
 We use Tensorboard and nmslib for visualization and nearest neighbor queries, respectively.
 
+The virtual conda environment can be setup via the included setup.sh script.
+
 Pull-requests are welcome.
 
 
