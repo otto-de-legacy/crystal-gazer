@@ -4,9 +4,9 @@ import tensorflow as tf
 
 
 class InteractionMapper(object):
-    def __init__(self, config=None):
+    def __init__(self, map_path):
 
-        self.cf = config
+        self.interaction_map_path = map_path
         self.num_to_interaction_dict, self.interaction_to_num_dict, max_interaction_num = self.load_dictionaries()
         self.total_interaction_cnt = max_interaction_num
         self.interaction_class_cnt = max_interaction_num + 2  # + default class and cuonting from zero
@@ -17,24 +17,22 @@ class InteractionMapper(object):
         interaction_to_num_dict = dict()
         max_interaction_num = 0
 
-        if self.cf is not None:
-            print()
-            with open(self.cf.interaction_map) as f:
-                lines = f.read().splitlines()
-                for line in lines:
-                    entries = line.split(",")
-                    if len(entries) == 2:
+        with open(self.interaction_map_path) as f:
+            lines = f.read().splitlines()
+            for line in lines:
+                entries = line.split(",")
+                if len(entries) == 2:
 
-                        num = int(entries[0])
-                        interaction = entries[1]
+                    num = int(entries[0])
+                    interaction = entries[1]
 
-                        if max_interaction_num < num:
-                            max_interaction_num = num
+                    if max_interaction_num < num:
+                        max_interaction_num = num
 
-                        num_to_interaction_dict[num] = interaction
-                        interaction_to_num_dict[interaction] = num
-                    else:
-                        print("Warn: entry seems corrupted (will be ignored), " + line)
+                    num_to_interaction_dict[num] = interaction
+                    interaction_to_num_dict[interaction] = num
+                else:
+                    print("Warn: entry seems corrupted (will be ignored), " + line)
         print("maximum interaction int found: " + str(max_interaction_num))
         return num_to_interaction_dict, interaction_to_num_dict, max_interaction_num
 

@@ -12,7 +12,7 @@ class Loader(object):
         self.cf = config
         self.random_generator, self.tot_event_cnt, self.unique_train_event_cnt = self._prepare_events(
             in_data_text.replace(" ", ""))
-        self.um = interaction_mapper
+        self.im = interaction_mapper
         self.epoch_cnt = 0
         self.batche_cnt = 0
         self.event_cnt = 0
@@ -91,12 +91,12 @@ class Loader(object):
         real_batch_events = self.get_random_events(real_batch_size)
         fake_batch_events = self.get_random_events(fake_batch_size)
 
-        fake_batch_events_clone = [Event(e.feature_idx, random.randint(0, self.um.total_interaction_cnt)) for e in fake_batch_events]
+        fake_batch_events_clone = [Event(e.feature_idx, random.randint(0, self.im.total_interaction_cnt)) for e in fake_batch_events]
 
         full_events = np.concatenate((real_batch_events, fake_batch_events_clone), axis=0)
 
-        features = self.um.idxs_to_tf([e.feature_idx for e in full_events])
-        labels = self.um.idxs_to_tf([e.label_idx for e in full_events])
+        features = self.im.idxs_to_tf([e.feature_idx for e in full_events])
+        labels = self.im.idxs_to_tf([e.label_idx for e in full_events])
         target_distance = np.concatenate((np.zeros(len(real_batch_events), np.float32),
              np.ones(len(fake_batch_events), np.float32)), axis=0)
 
@@ -130,9 +130,9 @@ class Loader(object):
         top_bucket_info = top_bucket_info + """----------------------------------------------------
             """
         for e in top_bucket["bucket_events"][0:20]:
-            top_bucket_info = top_bucket_info + "feature: " + self.um.num_to_interaction(e.feature_idx) + """
+            top_bucket_info = top_bucket_info + "feature: " + self.im.num_to_interaction(e.feature_idx) + """
             """
-            top_bucket_info = top_bucket_info + "target: " + self.um.num_to_interaction(e.label_idx) + """
+            top_bucket_info = top_bucket_info + "target: " + self.im.num_to_interaction(e.label_idx) + """
             """
             top_bucket_info = top_bucket_info + "occurence count: " + str(e.count) + """
             """

@@ -14,7 +14,7 @@ from core.trainer import Trainer
 cf = Config(short=True)
 cf.make_dirs()
 tbw = TensorboardWriter(cf)
-um = InteractionMapper(cf)
+um = InteractionMapper(cf.url_interaction_map)
 
 with open(cf.url_train_data, 'r') as f:
     txt = str(f.read())
@@ -25,7 +25,7 @@ test_loader = ld.Loader(cf, txt, um)
 
 network = Network(cf, um)
 trainer = Trainer(cf, network)
-ui = None
+ii = None
 mp = False
 x_label = None
 
@@ -66,8 +66,8 @@ with tf.Session() as sess:
             tbw.flush()
             print("epochs: " + str(train_loader.epoch_cnt))
 
-            ui = InteractionIndex(cf, um, trainer.get_interaction_embeddings(sess))
-            mp = MetricProfiler(cf, sess, tbw, train_loader, um, ui)
+            ii = InteractionIndex(um, trainer.get_interaction_embeddings(sess))
+            mp = MetricProfiler(cf, sess, tbw, train_loader, um, ii)
             mp.log_plots(x_label)
 
     mp.log_results()
@@ -76,5 +76,5 @@ with tf.Session() as sess:
 
     tbw.flush()
 
-ui.safe(cf.index_safe_path)
+ii.safe(cf.index_safe_path)
 input("Press Enter to continue...")

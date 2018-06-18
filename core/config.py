@@ -27,7 +27,7 @@ class Config:
         self.url_train_data = data_folder + '/train_data'
         self.url_test_data = data_folder + '/test_data'
 
-        self.interaction_map = data_folder + '/interaction_map'
+        self.url_interaction_map = data_folder + '/interaction_map'
 
         self.tb_command = "bash -c \"source /home/chambroc/miniconda3/bin/activate crystal && tensorboard --logdir="
 

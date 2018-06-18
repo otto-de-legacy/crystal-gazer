@@ -13,8 +13,7 @@ interaction_input = """1,2,3
 
 cf = Config()
 cf.neighboring_interactions = 1
-cf.interaction_map = None
-interaction_mapper = um.InteractionMapper()
+interaction_mapper = um.InteractionMapper('./resources/interaction_map')
 interaction_mapper.total_interaction_cnt = 6
 interaction_mapper.interaction_class_cnt = 8
 

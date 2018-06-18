@@ -29,5 +29,17 @@ Some performance metrics are plotted with Tensorboard.
 The (final) json file produced can be viewed via a chrome browser:
     chrome://tracing
 
+# REST API (WIP)
 
+## starting
+use gunicorn in virtual environment (see environment.yml)
+
+Start server:
+    gunicorn things:app
     
+## profiling
+install:
+    sudo apt install apache2-utils
+    
+profile via, e.g.:
+    ab -c 10 -n 100000 http://127.0.0.1:8000/things?url=a&k=15

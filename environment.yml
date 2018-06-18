@@ -1,6 +1,7 @@
 name: crystal
 channels:
 - defaults
+- conda-forge
 dependencies:
 - python=3.6.2
 - tensorflow=1.3.0
@@ -8,5 +9,7 @@ dependencies:
 - matplotlib=2.1.0
 - pandas=0.20.3
 - scipy=1.1.0
+- falcon=1.4.1
+- gunicorn
 - pip:
     - nmslib

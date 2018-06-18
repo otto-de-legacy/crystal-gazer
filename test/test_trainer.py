@@ -11,7 +11,7 @@ from core.config import Config
 dim = 3
 cf = Config()
 cf.embedding_size = dim
-interaction_map = um.InteractionMapper()
+interaction_map = um.InteractionMapper('./resources/interaction_map')
 network = nw.Network(cf, interaction_map)
 trainer = tn.Trainer(cf, network)
 
