@@ -18,9 +18,11 @@ from falcon_rest_api.ewma import EWMA
 
 cf = Config()
 im = InteractionMapper(map_path=cf.interaction_map_url)
-ii = InteractionIndex(im, pd.read_csv(cf.interaction_vectors_url, header=None).values)
+ii = InteractionIndex(im,
+                      pd.read_csv(cf.interaction_vectors_url, header=None).values,
+                      method=cf.method,
+                      space=cf.space)
 ewma = EWMA(100)
-
 
 class RecoResource(object):
     def on_get(self, req, resp):
@@ -52,10 +54,12 @@ class WhatWouldCarlSay(object):
     def on_get(self, req, resp):
         """Handles GET requests"""
         resp.status = falcon.HTTP_200
-        dt_avg_in_ms = ewma.values * 1000
-        if dt_avg_in_ms < 5:
-            statement = "its ok"
-        elif dt_avg_in_ms < 10:
+        dt_avg_in_s = ewma.values
+        if dt_avg_in_s is None:
+            statement = "no traffic means, it's fast enough"
+        elif dt_avg_in_s * 1000 < 5:
+            statement = "this is fine"
+        elif dt_avg_in_s * 1000 < 10:
             statement = "you can do better"
         else:
             statement = "your mama is faster than this"

@@ -5,16 +5,22 @@ import numpy as np
 
 
 class InteractionIndex(object):
-    def __init__(self, interaction_mapper, interaction_vectors, method='ghtree', space='cosinesimil'):
+    def __init__(self, interaction_mapper, interaction_vectors, method="ghtree", space="cosinesimil"):
         self.im = interaction_mapper
         self.interaction_vectors = interaction_vectors
+        self.index = nmslib.init(method=method, space=space)
+        self.index.addDataPointBatch(interaction_vectors)
 
+        if method == "hnsw":
+            self.index.createIndex({'post': 2}, print_progress=True)
+        elif method == "ghtree":
+            self.index.createIndex()
+        else:
+            self.index.createIndex()
         # if self.cf.short:
         # self.index = nmslib.init(method='ghtree', space='cosinesimil')
         # self.index = nmslib.init(method='ghtree', space='l2')
-        self.index = nmslib.init(method=method, space=space)
-        self.index.addDataPointBatch(interaction_vectors)
-        self.index.createIndex()
+
         # else:
         #    # self.index = nmslib.init(method='hnsw', space='cosinesimil')
         #    # self.index = nmslib.init(method='ghtree', space='l2')

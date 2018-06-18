@@ -34,8 +34,8 @@ The (final) json file produced can be viewed via a chrome browser:
 ## starting
 use gunicorn in virtual environment (see environment.yml)
 
-Start server:
-    gunicorn things:app
+Start server (set timeout to let it create the index):
+    gunicorn things:app --timeout=1500
     
 ## profiling
 install:
