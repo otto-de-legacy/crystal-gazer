@@ -9,13 +9,13 @@ class InteractionIndex(object):
         self.im = interaction_mapper
         self.interaction_vectors = interaction_vectors
 
-        #if self.cf.short:
-            # self.index = nmslib.init(method='ghtree', space='cosinesimil')
-            # self.index = nmslib.init(method='ghtree', space='l2')
+        # if self.cf.short:
+        # self.index = nmslib.init(method='ghtree', space='cosinesimil')
+        # self.index = nmslib.init(method='ghtree', space='l2')
         self.index = nmslib.init(method=method, space=space)
         self.index.addDataPointBatch(interaction_vectors)
         self.index.createIndex()
-        #else:
+        # else:
         #    # self.index = nmslib.init(method='hnsw', space='cosinesimil')
         #    # self.index = nmslib.init(method='ghtree', space='l2')
         #    self.index = nmslib.init(method='ghtree', space='cosinesimil')
@@ -41,4 +41,5 @@ class InteractionIndex(object):
         return self.knn_idx_query(self.im.interaction_to_num(interaction_str), k=k)
 
     def safe(self, path):
-        np.savetxt(path, self.interaction_vectors, delimiter=",")
+        np.savetxt(path + "interaction_index.txt", self.interaction_vectors, delimiter=",")
+        self.im.save(path)

@@ -11,7 +11,7 @@ from core.network import Network
 from core.tensorboard_writer import TensorboardWriter
 from core.trainer import Trainer
 
-cf = Config(short=True)
+cf = Config(short=False)
 cf.make_dirs()
 tbw = TensorboardWriter(cf)
 um = InteractionMapper(cf.url_interaction_map)

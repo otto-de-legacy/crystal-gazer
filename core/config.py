@@ -15,7 +15,7 @@ class Config:
 
         self.embedding_size = 100  # vector length of user interaction representation
 
-        self.epochs = 50  # number of epochs (epoch = whole train data processed) to train
+        self.epochs = 5  # number of epochs (epoch = whole train data processed) to train
 
         self.batch_size = 100000  # number of events processed in single step in tensorflow
         self.fake_frac = 0.7  # fraction of generated fake events for triplet loss
@@ -38,9 +38,9 @@ class Config:
         self.knn_final = 200  # nearest neighbor search explicit logging  after entire training
         self.result_cnt_final = 200  # weighted random interactions considered for weighted_pos_avg for final log
 
-        self.run_dir = os.getcwd() + "/.././output/run_" + datetime.datetime.now().strftime("%Y_%I_%B_%H:%M:%S")
+        self.run_dir = os.getcwd() + "/.././output/run_" + datetime.datetime.now().strftime("%Y_%B_%d_%H:%M:%S")
         self.tb_dir = self.run_dir + "/tensorboard"
-        self.index_safe_path = self.run_dir + "/interaction_indexing/interaction_index.txt"
+        self.index_safe_path = self.run_dir + "/interaction_indexing/"
         self.timeline_profile_path = self.run_dir + "/timeline_profile/timeline.json"
 
     def make_dirs(self):

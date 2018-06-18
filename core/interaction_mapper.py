@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import tensorflow as tf
+from shutil import copyfile
 
 
 class InteractionMapper(object):
@@ -40,7 +41,8 @@ class InteractionMapper(object):
         if interaction <= self.total_interaction_cnt:
             return interaction
         else:
-            print("Warn: interaction was: " + str(interaction) + ", only maximum of " + str(self.total_interaction_cnt) + "expected.")
+            print("Warn: interaction was: " + str(interaction) + ", only maximum of " + str(
+                self.total_interaction_cnt) + "expected.")
             return self.total_interaction_cnt
 
     def interaction_to_num(self, interaction):
@@ -73,3 +75,6 @@ class InteractionMapper(object):
         assumed unique interactions + 1(default) +1 (index from 0): """ + str(self.interaction_class_cnt) + """ 
         """
         return ret_string
+
+    def save(self, path):
+        copyfile(self.interaction_map_path, path + "interaction_map.txt")
