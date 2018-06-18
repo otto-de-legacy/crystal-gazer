@@ -15,7 +15,7 @@ class Config:
 
         self.embedding_size = 100  # vector length of user interaction representation
 
-        self.epochs = 5  # number of epochs (epoch = whole train data processed) to train
+        self.epochs = 50  # number of epochs (epoch = whole train data processed) to train
 
         self.batch_size = 100000  # number of events processed in single step in tensorflow
         self.fake_frac = 0.7  # fraction of generated fake events for triplet loss

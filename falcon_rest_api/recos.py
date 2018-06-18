@@ -15,6 +15,7 @@ from core.interaction_index import InteractionIndex
 from core.interaction_mapper import InteractionMapper
 from falcon_rest_api.config import Config
 from falcon_rest_api.ewma import EWMA
+from falcon_rest_api.cnt import CNT
 
 cf = Config()
 im = InteractionMapper(map_path=cf.interaction_map_url)
@@ -23,6 +24,7 @@ ii = InteractionIndex(im,
                       method=cf.method,
                       space=cf.space)
 ewma = EWMA(100)
+cnt = CNT()
 
 class RecoResource(object):
     def on_get(self, req, resp):
@@ -38,6 +40,7 @@ class RecoResource(object):
             # 'knn_distances': str(result[2]),
         }
         ewma.step(time.time() - t)
+        cnt.step(1)
 
 
 class MetricsResource(object):
@@ -46,7 +49,8 @@ class MetricsResource(object):
         resp.status = falcon.HTTP_200
         dt_avg = ewma.values
         resp.media = {
-            'average_last_100_request_duration_in_s': dt_avg
+            'average_last_100_request_duration_in_s': dt_avg,
+            'total_calls': cnt.values
         }
 
 

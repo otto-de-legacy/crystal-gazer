@@ -42,4 +42,4 @@ install:
     sudo apt install apache2-utils
     
 profile via, e.g.:
-    ab -c 10 -n 100000 http://127.0.0.1:8000/things?url=a&k=15
+    ab -c 10 -n 100000 http://127.0.0.1:8000/recos?url=aa
