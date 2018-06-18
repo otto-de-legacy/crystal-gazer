@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class CNT(object):  # TODO: define filter interface
     def __init__(self):
         self.values = None

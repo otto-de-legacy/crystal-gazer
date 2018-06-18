@@ -26,6 +26,8 @@ For the translation, we use a mapping, defined in the interaction_map file for e
 ## profiling
 Some performance metrics are plotted with Tensorboard.
 
+![tensorboard_example](doc/figures/tensorboard_example.png)
+
 The (final) json file produced can be viewed via a chrome browser:
     chrome://tracing
 

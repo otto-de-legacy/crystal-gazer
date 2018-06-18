@@ -1,12 +1,11 @@
 # recos.py
-
-# Let's get this party started!
 import os
-import time
-
-import pandas as pd
-import falcon
 import sys
+import time
+import numpy as np
+
+import falcon
+import pandas as pd
 
 print(os.getcwd())
 sys.path.insert(0, os.getcwd() + '/../')
@@ -18,13 +17,17 @@ from falcon_rest_api.ewma import EWMA
 from falcon_rest_api.cnt import CNT
 
 cf = Config()
+print("building map...")
 im = InteractionMapper(map_path=cf.interaction_map_url)
+print("building index...")
 ii = InteractionIndex(im,
                       pd.read_csv(cf.interaction_vectors_url, header=None).values,
                       method=cf.method,
                       space=cf.space)
-ewma = EWMA(100)
+ewma_dt = EWMA(100)
+ewma_frac = EWMA(10000)
 cnt = CNT()
+
 
 class RecoResource(object):
     def on_get(self, req, resp):
@@ -39,7 +42,22 @@ class RecoResource(object):
             'knn_urls': list(result[0]),
             # 'knn_distances': str(result[2]),
         }
-        ewma.step(time.time() - t)
+        dt = time.time() - t
+        if dt > 0.05:
+            bucket = np.array([0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        elif dt > 0.01:
+            bucket = np.array([100.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        elif dt > 0.005:
+            bucket = np.array([100.0, 100.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        elif dt > 0.001:
+            bucket = np.array([100.0, 100.0, 100.0, 0.0, 0.0], dtype=np.float32)
+        elif dt > 0.0005:
+            bucket = np.array([100.0, 100.0, 100.0, 100.0, 0.0], dtype=np.float32)
+        else:
+            bucket = np.array([100.0, 100.0, 100.0, 100.0, 100.0], dtype=np.float32)
+
+        ewma_dt.step(dt)
+        ewma_frac.step(bucket)
         cnt.step(1)
 
 
@@ -47,10 +65,15 @@ class MetricsResource(object):
     def on_get(self, req, resp):
         """Handles GET requests"""
         resp.status = falcon.HTTP_200
-        dt_avg = ewma.values
+        dt_avg = ewma_dt.values
         resp.media = {
             'average_last_100_request_duration_in_s': dt_avg,
-            'total_calls': cnt.values
+            'total_calls': cnt.values,
+            'perc_last_10000_above_50ms': float(ewma_frac(0)),
+            'perc_last_10000_above_10ms':  float(ewma_frac(1)),
+            'perc_last_10000_above_5ms':  float(ewma_frac(2)),
+            'perc_last_10000_above_1ms':   float(ewma_frac(3)),
+            'perc_last_10000_above_0.5ms':   float(ewma_frac(4))
         }
 
 
@@ -58,7 +81,7 @@ class WhatWouldCarlSay(object):
     def on_get(self, req, resp):
         """Handles GET requests"""
         resp.status = falcon.HTTP_200
-        dt_avg_in_s = ewma.values
+        dt_avg_in_s = ewma_dt.values
         if dt_avg_in_s is None:
             statement = "no traffic means, it's fast enough"
         elif dt_avg_in_s * 1000 < 5:

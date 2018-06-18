@@ -1,7 +1,3 @@
-import datetime
-import os
-
-
 class Config:
     """Contains static configurations"""
 
@@ -11,6 +7,7 @@ class Config:
         self.interaction_map_url = self.source_dir + "interaction_map.txt"
 
         self.method = "hnsw"
+        #self.method = "ghtree"
         self.space = "cosinesimil"
 
     def to_string(self):
