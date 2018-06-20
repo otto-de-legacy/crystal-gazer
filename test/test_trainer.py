@@ -9,9 +9,9 @@ import core.trainer as tn
 from core.config import Config
 
 dim = 3
-cf = Config()
+cf = Config('./resources')
 cf.embedding_size = dim
-interaction_map = um.InteractionMapper('./resources/interaction_map')
+interaction_map = um.InteractionMapper('./resources/map')
 network = nw.Network(cf, interaction_map)
 trainer = tn.Trainer(cf, network)
 
@@ -68,3 +68,8 @@ class TestTrainer(TestCase):
             result = sess.run(trainer._single_dist_(prediction, target))
 
         self.assertTrue(sum(abs(result - [1.0, 1.0])) < 0.001, msg="result incorrect for opposite input")
+
+    def try_initializing(self):
+        my_tensor = tf.random_normal([784, 200], stddev=0.35)
+
+        self.assertTrue(1==1, msg="result incorrect for opposite input")

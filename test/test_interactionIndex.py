@@ -6,7 +6,7 @@ from core.interaction_mapper import InteractionMapper
 
 class TestInteractionIndex(TestCase):
     def test_knn_idx_query(self):
-        im = InteractionMapper("./resources/interaction_map")
+        im = InteractionMapper("./resources/map")
         iv = [[0.0, 0.0, 0.0], [1.0, 2.0, 3.0]]
         ii = InteractionIndex(im, iv)
 
@@ -16,7 +16,7 @@ class TestInteractionIndex(TestCase):
 
 
     def test_knn_interaction_query(self):
-        im = InteractionMapper("./resources/interaction_map")
+        im = InteractionMapper("./resources/map")
         iv = [[0.0, 0.0, 0.0], [1.0, 2.0, 3.0]]
         ii = InteractionIndex(im, iv)
 
@@ -25,7 +25,7 @@ class TestInteractionIndex(TestCase):
         self.assertTrue(result[0][0] == "a")
 
     def test_knn_interaction_query_exception(self):
-        im = InteractionMapper("./resources/interaction_map")
+        im = InteractionMapper("./resources/map")
         iv = [[0.0, 0.0, 0.0], [1.0, 2.0, 3.0]]
         ii = InteractionIndex(im, iv)
 

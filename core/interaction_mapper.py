@@ -77,4 +77,4 @@ class InteractionMapper(object):
         return ret_string
 
     def save(self, path):
-        copyfile(self.interaction_map_path + "/map", path + "interaction_map.txt")
+        copyfile(self.interaction_map_path + "/map", path + "map.txt")

@@ -4,7 +4,7 @@ class Config:
     def __init__(self):
         self.source_dir = "/home/chambroc/github-projects/crystal-gazer/output/run_2018_June_18_17:40:38/interaction_indexing/"
         self.interaction_vectors_url = self.source_dir + "interaction_index.txt"
-        self.interaction_map_url = self.source_dir + "interaction_map.txt"
+        self.interaction_map_url = self.source_dir + "map.txt"
 
         self.method = "hnsw"
         #self.method = "ghtree"

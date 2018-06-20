@@ -9,9 +9,9 @@ from core.network import Network
 
 class TestNetwork(TestCase):
     def test_layer_sizes(self):
-        cf = Config()
+        cf = Config("'./resources")
         cf.embedding_size = 3
-        interaction_map = um.InteractionMapper('./resources/interaction_map')
+        interaction_map = um.InteractionMapper('./resources/map')
         test_netowrk = Network(cf, interaction_map)
 
         input_to_layer = tf.sparse_placeholder(tf.float32, shape=[None, interaction_map.interaction_class_cnt], name="interaction_feature")
