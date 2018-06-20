@@ -68,3 +68,12 @@ class TestTrainer(TestCase):
             result = sess.run(trainer._single_dist_(prediction, target))
 
         self.assertTrue(sum(abs(result - [1.0, 1.0])) < 0.001, msg="result incorrect for opposite input")
+
+    def test__normalization_penalty_(self):
+        vectors = tf.constant(np.array([
+            np.array([4.0, 4.0, 4.0, 4.0], dtype=np.float32),
+            np.array([4.0, 4.0, 4.0, 4.0], dtype=np.float32)]))
+        with tf.Session() as sess:
+            result = sess.run(trainer._normalization_penalty_(vectors))
+
+        self.assertTrue(result == 49.0, msg="")
