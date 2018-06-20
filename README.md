@@ -71,3 +71,19 @@ install:
     
 profile via, e.g.:
     ab -c 10 -n 100000 http://127.0.0.1:8000/recos?url=aa
+    
+    
+Profiling output of the rest-api calls on an i7 local machine for ca. 
+600 thousand items with a vector size of 100:
+```bash
+Percentage of the requests served within a certain time (ms)
+  50%      7
+  66%      7
+  75%      7
+  80%      7
+  90%      7
+  95%      8
+  98%      8
+  99%      8
+ 100%     26 (longest request)
+```
