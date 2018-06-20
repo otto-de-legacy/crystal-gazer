@@ -12,13 +12,13 @@ Prepare data with integer numbers as in test/train_data_small which is used as i
 Each line is one unser interaction history ordered w.r.t. time (see attached data), e.g.:
 
 ```bash
-0,_
-1,a
-2,b
-3,c
-4,d
-5,e
-6,f
+_,0
+a,1
+b,2
+c,3
+d,4
+e,5
+f,6
 ...
 ```
 

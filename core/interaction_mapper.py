@@ -24,8 +24,8 @@ class InteractionMapper(object):
                 entries = line.split(",")
                 if len(entries) == 2:
 
-                    num = int(entries[0])
-                    interaction = entries[1]
+                    num = int(entries[1])
+                    interaction = entries[0]
 
                     if max_interaction_num < num:
                         max_interaction_num = num
