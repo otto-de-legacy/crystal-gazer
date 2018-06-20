@@ -1,10 +1,11 @@
+import glob
 import random
 
 import numpy as np
-import os
+
 from core.data_sampler import DataSampler
 from core.event import Event
-import glob
+
 
 class Loader(object):
     def __init__(self, config, interaction_mapper, path):
@@ -62,33 +63,6 @@ class Loader(object):
 
         random_generator = DataSampler(xk, pk, bucket_count=self.cf.bucket_count)  #
         return random_generator, cnt_tot_events, cnt_uniqe_events
-
-    #
-    #
-    # def _prepare_events(self, text_content):
-    #     events = dict()
-    #     cnt_tot_events = 0
-    #     cnt_uniqe_events = 0
-    #     user_journeys = text_content.split("\n")
-    #     for strng in user_journeys:
-    #         for new_event in self._user_journey_to_events(strng):
-    #             cnt_tot_events = cnt_tot_events + 1
-    #             if new_event in events:
-    #                 events[new_event] = events[new_event] + 1
-    #             else:
-    #                 events[new_event] = 1
-    #                 cnt_uniqe_events = cnt_uniqe_events + 1
-    #             if cnt_tot_events % 100000 is 0:
-    #                 print("Events in list: " + str(cnt_tot_events))
-    #                 print("Events in dict: " + str(len(events)))
-    #
-    #     xk = list(events.keys())
-    #     for e, cnt in zip(events, events.values()):  # TODO: make this nicer by aggregation and sum elements
-    #         e.count = cnt
-    #     pk = list(np.array(list(events.values())) / cnt_tot_events)
-    #
-    #     random_generator = DataSampler(xk, pk, bucket_count=self.cf.bucket_count)  #
-    #     return random_generator, cnt_tot_events, cnt_uniqe_events
 
     def _prepare_eventsOLD(self, text_content):
         events = []
