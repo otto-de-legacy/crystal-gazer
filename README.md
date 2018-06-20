@@ -87,3 +87,15 @@ Percentage of the requests served within a certain time (ms)
   99%      8
  100%     26 (longest request)
 ```
+The internal nmslib call was:
+```bash
+average_last_100_request_duration_in_s	0.0003814718827198475
+total_calls	1000006
+perc_last_10000_below_50ms	99.98967742919922
+perc_last_10000_below_10ms	99.98967742919922
+perc_last_10000_below_5ms	99.98967742919922
+perc_last_10000_below_1ms	99.87962341308594
+perc_last_10000_below_0.5ms	98.5627670288086
+```
+
+Carl says that's ok.
