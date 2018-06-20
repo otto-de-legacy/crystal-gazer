@@ -36,7 +36,6 @@ log_txt = "Config: " + cf.to_string() + "\n\n" + \
           "Interaction mapper: " + um.to_string() + "\n\n" + \
           "Train Loader @start: " + train_loader.to_string() + "\n\n" + \
           "Test Loader @start: " + test_loader.to_string()
-
 cf.make_dirs()
 tbw = TensorboardWriter(cf)
 with tf.Session() as sess:
@@ -73,6 +72,7 @@ with tf.Session() as sess:
             ii = InteractionIndex(um, trainer.get_interaction_embeddings(sess))
             mp = MetricProfiler(cf, sess, tbw, train_loader, um, ii)
             mp.log_plots(x_label)
+            # print(np.linalg.norm(trainer.get_interaction_embeddings(sess) - pd_df.values))
 
     mp.log_results()
     with open(cf.timeline_profile_path, 'w') as f:

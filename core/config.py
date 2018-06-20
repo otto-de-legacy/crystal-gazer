@@ -22,7 +22,7 @@ class Config:
         # PREVIOUS RUN DATA
         self.continnue_previous_run = True
         self.previous_successful_output_run_dir = None
-        all_outputs = sorted(glob.glob(os.getcwd() + output_folder + "/*"), reverse=True)
+        all_outputs = sorted(glob.glob(os.getcwd() + output_folder + "/*"), reverse=False)
         if len(all_outputs) > 0:
             for folder in all_outputs:
                 if len(glob.glob(folder + "/_SUCCESS")) > 0:
@@ -33,10 +33,10 @@ class Config:
             input("Press Enter to continue with new random initialization...")
 
         # NETWORK SETUP:
-        self.embedding_size = 50  # vector length of user interaction representation
+        self.embedding_size = 3  # vector length of user interaction representation
 
         # TRAINING SETUP:
-        self.epochs = 10  # number of epochs (epoch = whole train data processed) to train
+        self.epochs = 50  # number of epochs (epoch = whole train data processed) to train
         self.batch_size = 100000  # number of events processed in single step in tensorflow
         self.fake_frac = 0.7  # fraction of generated fake events for triplet loss
         self.bucket_count = 10  # buckets of the self-made event randomizer
