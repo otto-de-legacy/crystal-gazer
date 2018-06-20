@@ -73,11 +73,11 @@ class MetricsResource(object):
         resp.media = {
             'average_last_100_request_duration_in_s': dt_avg,
             'total_calls': cnt.values,
-            'perc_last_10000_above_50ms': float(ewma_frac(0)),
-            'perc_last_10000_above_10ms':  float(ewma_frac(1)),
-            'perc_last_10000_above_5ms':  float(ewma_frac(2)),
-            'perc_last_10000_above_1ms':   float(ewma_frac(3)),
-            'perc_last_10000_above_0.5ms':   float(ewma_frac(4))
+            'perc_last_10000_below_50ms': float(ewma_frac(0)),
+            'perc_last_10000_below_10ms':  float(ewma_frac(1)),
+            'perc_last_10000_below_5ms':  float(ewma_frac(2)),
+            'perc_last_10000_below_1ms':   float(ewma_frac(3)),
+            'perc_last_10000_below_0.5ms':   float(ewma_frac(4))
         }
 
 
