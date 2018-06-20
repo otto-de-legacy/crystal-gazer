@@ -41,7 +41,7 @@ class Config:
         self.fake_frac = 0.7  # fraction of generated fake events for triplet loss
         self.bucket_count = 10  # buckets of the self-made event randomizer
         self.neighboring_interactions = 4  # distance of user_interactions still considered
-        self.learning_rate = 0.001  # learning rate for tensorflow
+        self.learning_rate = 0.01  # learning rate for tensorflow
 
         # EVALUATION SETUP:
         self.events_from_true_data = 100  # top events considered from true data when calculating weighted_pos_avg

@@ -17,7 +17,8 @@ from pathlib import Path
 cf = Config(root_folder="./resources", output_folder="/.././output")
 um = InteractionMapper(cf.path_interaction_map)
 if cf.continnue_previous_run:
-    pd_df = pd.read_csv(cf.previous_successful_output_run_dir + "/interaction_indexing/interaction_index.txt", header=None)
+    pd_df = pd.read_csv(cf.previous_successful_output_run_dir + "/interaction_indexing/interaction_index.txt",
+                        header=None)
     for col in pd_df.columns:
         pd_df[col] = pd_df[col].astype(np.float32)
     network = Network(cf, um, preheated_embeddings=pd_df.values)
@@ -69,7 +70,10 @@ with tf.Session() as sess:
             tbw.flush()
             print("epochs: " + str(train_loader.epoch_cnt))
 
-            ii = InteractionIndex(um, trainer.get_interaction_embeddings(sess))
+            embedding_vectors = trainer.get_interaction_embeddings(sess)
+            tbw.log_scalar(np.average(np.linalg.norm(embedding_vectors, axis=1)), x_label,
+                           tag="evaluation_metric: average norm of embedding vectors (normalization condition will force it towards 1)")
+            ii = InteractionIndex(um, embedding_vectors)
             mp = MetricProfiler(cf, sess, tbw, train_loader, um, ii)
             mp.log_plots(x_label)
             # print(np.linalg.norm(trainer.get_interaction_embeddings(sess) - pd_df.values))
