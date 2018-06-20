@@ -22,7 +22,7 @@ class Network:
                 raise ValueError('preheated_embeddings, shape= ' + str(pre_shape) + ' has not the shape in the config, shape=' + str(cf_shape))
             initial_embedding = tf.Variable(tf.constant(preheated_embeddings))
         else:
-            initial_embedding = tf.Variable(tf.random_normal([num_categories, self.cf.embedding_size], stddev=rand_std))
+            initial_embedding = tf.Variable(tf.random_normal([num_categories, self.cf.embedding_size], stddev=1/self.cf.embedding_size))
 
         self.weights = {
             'w_embedding': initial_embedding,
