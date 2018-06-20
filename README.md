@@ -9,7 +9,30 @@ Pull-requests are welcome.
 
 ## prior data preparation
 Prepare data with integer numbers as in test/train_data_small which is used as input.
-Each line is one unser interaction history ordered w.r.t. time.
+Each line is one unser interaction history ordered w.r.t. time (see attached data), e.g.:
+
+```bash
+0,_
+1,a
+2,b
+3,c
+4,d
+5,e
+6,f
+...
+```
+
+A map to string is needed (see attached data), e.g.:
+
+```bash
+15,8,34,15,76,77,78,38,76,79,40,76,8,50
+15,15,92,15,92,15,92,15,92
+15,35,38,37,39,36,40,41,35,15,35,37,39,36,38,40,41,35
+29,30
+68,68,15
+15,6,15,6,3,4,5,15,6,15,6,15
+... 
+```
 
 ## overview
 Naming convention:
@@ -30,6 +53,9 @@ Some performance metrics are plotted with Tensorboard.
 
 The (final) json file produced can be viewed via a chrome browser:
     chrome://tracing
+
+![json_profiling_example](doc/figures/json_profiling.png)
+
 
 # REST API (WIP)
 
