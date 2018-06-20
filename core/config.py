@@ -6,7 +6,7 @@ import os
 class Config:
     """Contains static configurations"""
 
-    def __init__(self, root_folder, output_folder=""):
+    def __init__(self, root_folder, continue_previous_run=True, output_folder=""):
         # DIRECTORIES:
         self.short = root_folder
         self.root_folder = root_folder
@@ -20,7 +20,7 @@ class Config:
         self.tb_command = "bash -c \"source /home/chambroc/miniconda3/bin/activate crystal && tensorboard --logdir="
 
         # PREVIOUS RUN DATA
-        self.continnue_previous_run = True
+        self.continnue_previous_run = continue_previous_run
         self.previous_successful_output_run_dir = None
         all_outputs = sorted(glob.glob(os.getcwd() + output_folder + "/*"), reverse=False)
         if len(all_outputs) > 0:

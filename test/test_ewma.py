@@ -1,11 +1,7 @@
 from unittest import TestCase
 
 import numpy as np
-import tensorflow as tf
 
-import core.interaction_mapper as um
-import core.network as nw
-import core.trainer as tn
 from falcon_rest_api.ewma import EWMA
 
 

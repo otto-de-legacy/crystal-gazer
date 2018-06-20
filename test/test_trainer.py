@@ -9,7 +9,7 @@ import core.trainer as tn
 from core.config import Config
 
 dim = 3
-cf = Config('./resources')
+cf = Config('./resources', continue_previous_run=False)
 cf.embedding_size = dim
 interaction_map = um.InteractionMapper('./resources/map')
 network = nw.Network(cf, interaction_map)

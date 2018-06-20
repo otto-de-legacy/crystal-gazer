@@ -11,11 +11,12 @@ interaction_input = """1,2,3
         2,3,2,1,3
         2,5,2,4,3"""
 
-cf = Config("./resources")
+cf = Config("./resources", continue_previous_run=False)
 cf.neighboring_interactions = 1
 interaction_mapper = um.InteractionMapper('./resources/map')
 interaction_mapper.total_interaction_cnt = 6
 interaction_mapper.interaction_class_cnt = 8
+
 
 class TestLoader(TestCase):
 

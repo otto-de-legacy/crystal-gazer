@@ -48,14 +48,16 @@ class Trainer(object):
     def _single_loss_(self, single_dist, exp_dist):
         return tf.pow(single_dist - exp_dist, 2)
 
-    def _loss_(self, interaction_vectors, prediction, target, exp_dist):
-        single_loss = self._single_loss_(self._single_dist_(prediction, target), exp_dist)
-
+    def _normalization_penalty_(self, interaction_vectors):
         norm = tf.norm(interaction_vectors, axis=1)
         norm_minus_one = tf.pow(norm - tf.ones_like(norm, tf.float32), 2)
-        self.interaction_vector_norm_renormalization_condition = tf.reduce_mean(norm_minus_one)
+        interaction_vector_norm_renormalization_condition = tf.reduce_mean(norm_minus_one)
 
-        return tf.reduce_mean(single_loss) + self.interaction_vector_norm_renormalization_condition
+        return interaction_vector_norm_renormalization_condition
+
+    def _loss_(self, interaction_vectors, prediction, target, exp_dist):
+        single_loss = self._single_loss_(self._single_dist_(prediction, target), exp_dist)
+        return tf.reduce_mean(single_loss) + self._normalization_penalty_(interaction_vectors)
 
     def train(self, sess, batch_x, batch_y, exp_dist):
 

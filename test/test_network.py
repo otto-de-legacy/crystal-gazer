@@ -1,12 +1,13 @@
 from unittest import TestCase
 
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+
 import core.interaction_mapper as um
 from core.config import Config
 from core.network import Network
 
-cf = Config("'./resources")
+cf = Config("'./resources", continue_previous_run=False)
 cf.embedding_size = 3
 interaction_map = um.InteractionMapper('./resources/map')
 
@@ -41,4 +42,3 @@ class TestNetwork(TestCase):
             result = sess.run(test_netowrk.embedd_interaction_sparse_tensor(interaction_sparse_tensor))
 
         np.testing.assert_array_equal(result, [[-1.0, -1.0, 4.0]])
-

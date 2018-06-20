@@ -1,7 +1,7 @@
 from collections import namedtuple
 from unittest import TestCase
 
-from falcon_rest_api.recos import MetricsResource
+# from falcon_rest_api.recos import MetricsResource
 
 ResponseMock = namedtuple("response_mock", [
     "status",
@@ -9,7 +9,7 @@ ResponseMock = namedtuple("response_mock", [
 ])
 
 
-class TestEWMA(TestCase):
+class TestMetricsResource(TestCase):
 
     def test_works_with_vectors(self):
         # TODO: mock correctly

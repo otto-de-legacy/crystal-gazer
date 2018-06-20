@@ -14,7 +14,6 @@ class TestInteractionIndex(TestCase):
 
         self.assertTrue(result[0][0] == "a")
 
-
     def test_knn_interaction_query(self):
         im = InteractionMapper("./resources/map")
         iv = [[0.0, 0.0, 0.0], [1.0, 2.0, 3.0]]
@@ -31,7 +30,6 @@ class TestInteractionIndex(TestCase):
 
         result = ii.knn_interaction_query("")
 
-        self.assertTrue(len(result[0]) == 0 )
-        self.assertTrue(len(result[1]) == 0 )
-        self.assertTrue(len(result[2]) == 0 )
-
+        self.assertTrue(len(result[0]) == 0)
+        self.assertTrue(len(result[1]) == 0)
+        self.assertTrue(len(result[2]) == 0)
