@@ -11,15 +11,15 @@ from core.network import Network
 from core.tensorboard_writer import TensorboardWriter
 from core.trainer import Trainer
 
-cf = Config(short=False)
+cf = Config(root_folder="./resources")
 cf.make_dirs()
 tbw = TensorboardWriter(cf)
-um = InteractionMapper(cf.url_interaction_map)
+um = InteractionMapper(cf.path_interaction_map)
 
-with open(cf.url_train_data, 'r') as f:
+with open(cf.path_train_data, 'r') as f:
     txt = str(f.read())
 train_loader = ld.Loader(cf, txt, um)
-with open(cf.url_test_data, 'r') as f:
+with open(cf.path_test_data, 'r') as f:
     txt = str(f.read())
 test_loader = ld.Loader(cf, txt, um)
 
