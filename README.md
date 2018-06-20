@@ -63,15 +63,18 @@ The (final) json file produced can be viewed via a chrome browser:
 use gunicorn in virtual environment (see environment.yml)
 
 Start server (set timeout to let it create the index):
-    gunicorn things:app --timeout=1500
-    
+```bash
+    gunicorn recos:app --timeout=1500
+```    
 ## profiling
 install:
+```bash
     sudo apt install apache2-utils
-    
+```    
 profile via, e.g.:
+```bash
     ab -c 10 -n 100000 http://127.0.0.1:8000/recos?url=aa
-    
+```    
     
 Profiling output of the rest-api calls on an i7 local machine for ca. 
 600 thousand items with a vector size of 100:
