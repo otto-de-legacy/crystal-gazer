@@ -4,6 +4,11 @@ We use Tensorboard and nmslib for visualization and nearest neighbor queries, re
 
 The virtual conda environment can be setup via the included setup.sh script.
 
+What is under the hood:
+* nmslib: https://github.com/nmslib/nmslib
+* tensorflow: https://github.com/tensorflow/tensorflow
+* falcon: https://github.com/falconry/falcon
+
 Pull-requests are welcome.
 
 

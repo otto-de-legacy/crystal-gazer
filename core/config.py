@@ -12,7 +12,8 @@ class Config:
         self.path_train_data = self.root_folder + '/train'
         self.path_test_data = self.root_folder + '/test'
         self.path_interaction_map = self.root_folder + '/map'
-        self.output_run_dir = os.getcwd() + output_folder + "/run_" + datetime.datetime.now().strftime("%Y_%B_%d_%H:%M:%S")
+        self.output_run_dir = os.getcwd() + output_folder + "/run_" + datetime.datetime.now().strftime(
+            "%Y_%B_%d_%H:%M:%S")
         self.tb_dir = self.output_run_dir + "/tensorboard"
         self.index_safe_path = self.output_run_dir + "/interaction_indexing"
         self.timeline_profile_path = self.output_run_dir + "/timeline_profile/timeline.json"
@@ -76,7 +77,7 @@ class Config:
         
         Previous model dependence:
         
-        previous_successful_output_run_dir: """ + self.previous_successful_output_run_dir + """
+        previous_successful_output_run_dir: """ + str(self.previous_successful_output_run_dir) + """
         
         General parameters of the config:
         
@@ -94,6 +95,5 @@ class Config:
         knn_plots: """ + str(self.knn_plots) + """
         result_cnt_plots: """ + str(self.result_cnt_plots) + """
         knn_final: """ + str(self.knn_final) + """
-        result_cnt_final: """ + str(self.result_cnt_final) + """
         """
         return ret_string

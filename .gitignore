@@ -15,3 +15,4 @@ output/*
 /core/resources_full/*
 stuff
 __main_private__.py
+output_full
