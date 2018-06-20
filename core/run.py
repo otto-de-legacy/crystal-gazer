@@ -2,6 +2,8 @@ import time
 
 import tensorflow as tf
 
+import numpy as np
+import pandas as pd
 import core.loader as ld
 from core.config import Config
 from core.interaction_index import InteractionIndex
@@ -10,15 +12,21 @@ from core.metric_profiler import MetricProfiler
 from core.network import Network
 from core.tensorboard_writer import TensorboardWriter
 from core.trainer import Trainer
+from pathlib import Path
 
-cf = Config(root_folder="./resources")
-cf.make_dirs()
-tbw = TensorboardWriter(cf)
+cf = Config(root_folder="./resources", output_folder="/.././output")
 um = InteractionMapper(cf.path_interaction_map)
+if cf.continnue_previous_run:
+    pd_df = pd.read_csv(cf.previous_successful_output_run_dir + "/interaction_indexing/interaction_index.txt", header=None)
+    for col in pd_df.columns:
+        pd_df[col] = pd_df[col].astype(np.float32)
+    network = Network(cf, um, preheated_embeddings=pd_df.values)
+else:
+    network = Network(cf, um)
 
 train_loader = ld.Loader(cf, um, cf.path_train_data)
 test_loader = ld.Loader(cf, um, cf.path_test_data)
-network = Network(cf, um)
+
 trainer = Trainer(cf, network)
 ii = None
 mp = False
@@ -29,6 +37,8 @@ log_txt = "Config: " + cf.to_string() + "\n\n" + \
           "Train Loader @start: " + train_loader.to_string() + "\n\n" + \
           "Test Loader @start: " + test_loader.to_string()
 
+cf.make_dirs()
+tbw = TensorboardWriter(cf)
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
 
@@ -71,4 +81,6 @@ with tf.Session() as sess:
     tbw.flush()
 
 ii.safe(cf.index_safe_path)
+
+Path(cf.output_run_dir + '/_SUCCESS').touch()
 input("Press Enter to continue...")

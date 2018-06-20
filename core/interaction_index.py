@@ -47,5 +47,5 @@ class InteractionIndex(object):
         return self.knn_idx_query(self.im.interaction_to_num(interaction_str), k=k)
 
     def safe(self, path):
-        np.savetxt(path + "interaction_index.txt", self.interaction_vectors, delimiter=",")
+        np.savetxt(path + "/interaction_index.txt", self.interaction_vectors, delimiter=",")
         self.im.save(path)

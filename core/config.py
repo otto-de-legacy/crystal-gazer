@@ -1,28 +1,42 @@
 import datetime
+import glob
 import os
 
 
 class Config:
     """Contains static configurations"""
 
-    def __init__(self, root_folder):
+    def __init__(self, root_folder, output_folder=""):
         # DIRECTORIES:
         self.short = root_folder
         self.root_folder = root_folder
         self.path_train_data = self.root_folder + '/train'
         self.path_test_data = self.root_folder + '/test'
         self.path_interaction_map = self.root_folder + '/map'
-        self.run_dir = os.getcwd() + "/.././output/run_" + datetime.datetime.now().strftime("%Y_%B_%d_%H:%M:%S")
-        self.tb_dir = self.run_dir + "/tensorboard"
-        self.index_safe_path = self.run_dir + "/interaction_indexing/"
-        self.timeline_profile_path = self.run_dir + "/timeline_profile/timeline.json"
+        self.output_run_dir = os.getcwd() + output_folder + "/run_" + datetime.datetime.now().strftime("%Y_%B_%d_%H:%M:%S")
+        self.tb_dir = self.output_run_dir + "/tensorboard"
+        self.index_safe_path = self.output_run_dir + "/interaction_indexing"
+        self.timeline_profile_path = self.output_run_dir + "/timeline_profile/timeline.json"
         self.tb_command = "bash -c \"source /home/chambroc/miniconda3/bin/activate crystal && tensorboard --logdir="
 
+        # PREVIOUS RUN DATA
+        self.continnue_previous_run = True
+        self.previous_successful_output_run_dir = None
+        all_outputs = sorted(glob.glob(os.getcwd() + output_folder + "/*"), reverse=True)
+        if len(all_outputs) > 0:
+            for folder in all_outputs:
+                if len(glob.glob(folder + "/_SUCCESS")) > 0:
+                    self.previous_successful_output_run_dir = folder
+        if self.continnue_previous_run and (self.previous_successful_output_run_dir is None):
+            self.continnue_previous_run = False
+            print("WARN: no successful previous run found!")
+            input("Press Enter to continue with new random initialization...")
+
         # NETWORK SETUP:
-        self.embedding_size = 100  # vector length of user interaction representation
+        self.embedding_size = 50  # vector length of user interaction representation
 
         # TRAINING SETUP:
-        self.epochs = 60  # number of epochs (epoch = whole train data processed) to train
+        self.epochs = 10  # number of epochs (epoch = whole train data processed) to train
         self.batch_size = 100000  # number of events processed in single step in tensorflow
         self.fake_frac = 0.7  # fraction of generated fake events for triplet loss
         self.bucket_count = 10  # buckets of the self-made event randomizer
@@ -37,15 +51,15 @@ class Config:
         self.result_cnt_final = 200  # weighted random interactions considered for weighted_pos_avg for final log
 
     def make_dirs(self):
-        os.mkdir(self.run_dir)
+        os.mkdir(self.output_run_dir)
 
-        os.mkdir(self.run_dir + "/tensorboard")
-        os.mkdir(self.run_dir + "/tensorboard/train")
-        os.mkdir(self.run_dir + "/tensorboard/test")
-        os.mkdir(self.run_dir + "/tensorboard/log")
+        os.mkdir(self.output_run_dir + "/tensorboard")
+        os.mkdir(self.output_run_dir + "/tensorboard/train")
+        os.mkdir(self.output_run_dir + "/tensorboard/test")
+        os.mkdir(self.output_run_dir + "/tensorboard/log")
 
-        os.mkdir(self.run_dir + "/timeline_profile")
-        os.mkdir(self.run_dir + "/interaction_indexing")
+        os.mkdir(self.output_run_dir + "/timeline_profile")
+        os.mkdir(self.output_run_dir + "/interaction_indexing")
 
     def to_string(self):
         ret_string = """

@@ -41,7 +41,7 @@ class InteractionMapper(object):
         if interaction <= self.total_interaction_cnt:
             return interaction
         else:
-            print("Warn: interaction was: " + str(interaction) + ", only maximum of " + str(
+            print("WARN: interaction was: " + str(interaction) + ", only maximum of " + str(
                 self.total_interaction_cnt) + "expected.")
             return self.total_interaction_cnt
 
@@ -77,4 +77,4 @@ class InteractionMapper(object):
         return ret_string
 
     def save(self, path):
-        copyfile(self.interaction_map_path + "/map", path + "map.txt")
+        copyfile(self.interaction_map_path + "/map", path + "/map.txt")

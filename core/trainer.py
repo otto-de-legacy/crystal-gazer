@@ -84,8 +84,8 @@ class Trainer(object):
         return self.test_output[0]
 
     def get_interaction_embeddings(self, sess):
-        tot_interactions = self.network.im.total_interaction_cnt
-        interaction_sparse_vectors = self.network.im.idxs_to_tf(range(tot_interactions))
+        allclasses_cnt = self.network.im.interaction_class_cnt
+        interaction_sparse_vectors = self.network.im.idxs_to_tf(range(allclasses_cnt))
         return sess.run(self.network.embedd_interaction_sparse_tensor(self.x), feed_dict={self.x: interaction_sparse_vectors})
 
     def print_info_(self):
