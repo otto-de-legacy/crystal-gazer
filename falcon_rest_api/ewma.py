@@ -13,7 +13,7 @@ class EWMA(object):  # TODO: define filter interface
         if self.values is None:
             self.values = y
         else:
-            self.values = y * self.factor + (y * (1.0 - self.factor))
+            self.values = self.values * self.factor + (y * (1.0 - self.factor))
 
     def __call__(self, i=None):
         if self.values is None:
@@ -23,5 +23,5 @@ class EWMA(object):  # TODO: define filter interface
         else:
             return self.values[i]
 
-    def values(self):
+    def get_values(self):
         return self.values

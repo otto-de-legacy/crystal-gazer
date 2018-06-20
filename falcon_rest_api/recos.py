@@ -20,10 +20,14 @@ cf = Config()
 print("building map...")
 im = InteractionMapper(map_path=cf.interaction_map_url)
 print("building index...")
+pd_df = pd.read_csv(cf.interaction_vectors_url, header=None)
+for col in pd_df.columns:
+    pd_df[col] = pd_df[col].astype(float)
 ii = InteractionIndex(im,
-                      pd.read_csv(cf.interaction_vectors_url, header=None).values,
+                      pd_df.values,
                       method=cf.method,
                       space=cf.space)
+print("...index ready")
 ewma_dt = EWMA(100)
 ewma_frac = EWMA(10000)
 cnt = CNT()

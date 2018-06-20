@@ -16,5 +16,5 @@ class TestInteractionMapper(TestCase):
         im = InteractionMapper('./resources/interaction_map')
         tensor = im.idxs_to_tf([0, 1])
         np.testing.assert_array_equal(np.array(tensor.indices), np.array([[0, 0], [1, 1]]), err_msg="indices incorrect")
-        np.testing.assert_array_equal(np.array(tensor.values), np.array([1, 1]), err_msg="values incorrect")
+        np.testing.assert_array_equal(np.array(tensor.get_values), np.array([1, 1]), err_msg="values incorrect")
         np.testing.assert_array_equal(np.array(tensor.dense_shape), np.array([2, im.interaction_class_cnt]), err_msg="shape incorrect")
