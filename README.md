@@ -4,10 +4,11 @@ We use Tensorboard and nmslib for visualization and nearest neighbor queries, re
 
 The virtual conda environment can be setup via the included setup.sh script.
 
-What is under the hood:
+What is under the hood beside python standard libraries such as pandas, scipy, ...:
 * nmslib: https://github.com/nmslib/nmslib
 * tensorflow: https://github.com/tensorflow/tensorflow
 * falcon: https://github.com/falconry/falcon
+* gunicorn: https://github.com/benoitc/gunicorn
 
 Pull-requests are welcome.
 
