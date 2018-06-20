@@ -1,20 +1,21 @@
-# -*- coding: utf-8 -*-
 import random
 
 import numpy as np
-
+import os
 from core.data_sampler import DataSampler
 from core.event import Event
-
+import glob
 
 class Loader(object):
-    def __init__(self, config, in_data_text, interaction_mapper):
+    def __init__(self, config, interaction_mapper, path):
+        """will try to read ALL files in path!"""
         self.cf = config
-        self.random_generator, self.tot_event_cnt, self.unique_train_event_cnt = self._prepare_events(
-            in_data_text.replace(" ", ""))
+        self.root_path = path
+        # self.data_urls = os.listdir(path)
+        self.random_generator, self.tot_event_cnt, self.unique_train_event_cnt = self._prepare_events()
         self.im = interaction_mapper
         self.epoch_cnt = 0
-        self.batche_cnt = 0
+        self.batch_cnt = 0
         self.event_cnt = 0
         self.new_epoch = True
 
@@ -26,31 +27,33 @@ class Loader(object):
             interaction = user_interaction[i]
             f_idx = int(interaction)
 
-            for n in range(self.cf.neighboring_interactions+1):
-                if n+i > len(user_interaction)-1:
-                     break
+            for n in range(self.cf.neighboring_interactions + 1):
+                if n + i > len(user_interaction) - 1:
+                    break
                 interaction_plus_n = user_interaction[i + n]
                 t_idx = int(interaction_plus_n)
                 if f_idx is not t_idx:
                     events.append(Event(f_idx, t_idx))
         return events
 
-    def _prepare_events(self, text_content):
+    def _prepare_events(self):
         events = dict()
         cnt_tot_events = 0
         cnt_uniqe_events = 0
-        user_journeys = text_content.split("\n")
-        for strng in user_journeys:
-            for new_event in self._user_journey_to_events(strng):
-                cnt_tot_events = cnt_tot_events + 1
-                if new_event in events:
-                    events[new_event] = events[new_event] + 1
-                else:
-                    events[new_event] = 1
-                    cnt_uniqe_events = cnt_uniqe_events + 1
-                if cnt_tot_events % 100000 is 0:
-                    print("Events in list: " + str(cnt_tot_events))
-                    print("Events in dict: " + str(len(events)))
+
+        for file_url in glob.glob(self.root_path + "/*"):
+            with open(file_url) as f:
+                for line in f:
+                    for new_event in self._user_journey_to_events(line):
+                        cnt_tot_events = cnt_tot_events + 1
+                        if new_event in events:
+                            events[new_event] = events[new_event] + 1
+                        else:
+                            events[new_event] = 1
+                            cnt_uniqe_events = cnt_uniqe_events + 1
+                        if cnt_tot_events % 100000 is 0:
+                            print("Events in list: " + str(cnt_tot_events))
+                            print("Events in dict: " + str(len(events)))
 
         xk = list(events.keys())
         for e, cnt in zip(events, events.values()):  # TODO: make this nicer by aggregation and sum elements
@@ -59,6 +62,33 @@ class Loader(object):
 
         random_generator = DataSampler(xk, pk, bucket_count=self.cf.bucket_count)  #
         return random_generator, cnt_tot_events, cnt_uniqe_events
+
+    #
+    #
+    # def _prepare_events(self, text_content):
+    #     events = dict()
+    #     cnt_tot_events = 0
+    #     cnt_uniqe_events = 0
+    #     user_journeys = text_content.split("\n")
+    #     for strng in user_journeys:
+    #         for new_event in self._user_journey_to_events(strng):
+    #             cnt_tot_events = cnt_tot_events + 1
+    #             if new_event in events:
+    #                 events[new_event] = events[new_event] + 1
+    #             else:
+    #                 events[new_event] = 1
+    #                 cnt_uniqe_events = cnt_uniqe_events + 1
+    #             if cnt_tot_events % 100000 is 0:
+    #                 print("Events in list: " + str(cnt_tot_events))
+    #                 print("Events in dict: " + str(len(events)))
+    #
+    #     xk = list(events.keys())
+    #     for e, cnt in zip(events, events.values()):  # TODO: make this nicer by aggregation and sum elements
+    #         e.count = cnt
+    #     pk = list(np.array(list(events.values())) / cnt_tot_events)
+    #
+    #     random_generator = DataSampler(xk, pk, bucket_count=self.cf.bucket_count)  #
+    #     return random_generator, cnt_tot_events, cnt_uniqe_events
 
     def _prepare_eventsOLD(self, text_content):
         events = []
@@ -71,7 +101,7 @@ class Loader(object):
         if self.event_cnt % self.unique_train_event_cnt >= (self.event_cnt + batch_size) % self.unique_train_event_cnt:
             self.epoch_cnt += 1
             self.new_epoch = True
-        self.batche_cnt += 1
+        self.batch_cnt += 1
         self.event_cnt += batch_size
 
     def get_random_events(self, size):
@@ -91,14 +121,15 @@ class Loader(object):
         real_batch_events = self.get_random_events(real_batch_size)
         fake_batch_events = self.get_random_events(fake_batch_size)
 
-        fake_batch_events_clone = [Event(e.feature_idx, random.randint(0, self.im.total_interaction_cnt)) for e in fake_batch_events]
+        fake_batch_events_clone = [Event(e.feature_idx, random.randint(0, self.im.total_interaction_cnt)) for e in
+                                   fake_batch_events]
 
         full_events = np.concatenate((real_batch_events, fake_batch_events_clone), axis=0)
 
         features = self.im.idxs_to_tf([e.feature_idx for e in full_events])
         labels = self.im.idxs_to_tf([e.label_idx for e in full_events])
         target_distance = np.concatenate((np.zeros(len(real_batch_events), np.float32),
-             np.ones(len(fake_batch_events), np.float32)), axis=0)
+                                          np.ones(len(fake_batch_events), np.float32)), axis=0)
 
         self._update_processed_state(eff_batch_size)
         return features, labels, target_distance
@@ -113,7 +144,7 @@ class Loader(object):
         events considered in total: """ + str(self.tot_event_cnt) + """
         unique train events: """ + str(self.unique_train_event_cnt) + """
         epochs processed: """ + str(self.epoch_cnt) + """
-        batches processed: """ + str(self.batche_cnt) + """
+        batches processed: """ + str(self.batch_cnt) + """
         events processed: """ + str(self.event_cnt) + """
         
         

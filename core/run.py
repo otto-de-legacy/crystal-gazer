@@ -16,13 +16,8 @@ cf.make_dirs()
 tbw = TensorboardWriter(cf)
 um = InteractionMapper(cf.path_interaction_map)
 
-with open(cf.path_train_data, 'r') as f:
-    txt = str(f.read())
-train_loader = ld.Loader(cf, txt, um)
-with open(cf.path_test_data, 'r') as f:
-    txt = str(f.read())
-test_loader = ld.Loader(cf, txt, um)
-
+train_loader = ld.Loader(cf, um, cf.path_train_data)
+test_loader = ld.Loader(cf, um, cf.path_test_data)
 network = Network(cf, um)
 trainer = Trainer(cf, network)
 ii = None
@@ -33,7 +28,6 @@ log_txt = "Config: " + cf.to_string() + "\n\n" + \
           "Interaction mapper: " + um.to_string() + "\n\n" + \
           "Train Loader @start: " + train_loader.to_string() + "\n\n" + \
           "Test Loader @start: " + test_loader.to_string()
-
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())

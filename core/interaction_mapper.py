@@ -18,7 +18,7 @@ class InteractionMapper(object):
         interaction_to_num_dict = dict()
         max_interaction_num = 0
 
-        with open(self.interaction_map_path) as f:
+        with open(self.interaction_map_path + "/map") as f:
             lines = f.read().splitlines()
             for line in lines:
                 entries = line.split(",")
@@ -77,4 +77,4 @@ class InteractionMapper(object):
         return ret_string
 
     def save(self, path):
-        copyfile(self.interaction_map_path, path + "interaction_map.txt")
+        copyfile(self.interaction_map_path + "/map", path + "interaction_map.txt")
