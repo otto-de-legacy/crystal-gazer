@@ -8,7 +8,6 @@ class Config:
 
     def __init__(self, root_folder, continue_previous_run=True, output_folder=""):
         # DIRECTORIES:
-        self.short = root_folder
         self.root_folder = root_folder
         self.path_train_data = self.root_folder + '/train'
         self.path_test_data = self.root_folder + '/test'
@@ -63,13 +62,38 @@ class Config:
 
     def to_string(self):
         ret_string = """
+        Paths for in and output:
+        
+        root_folder: """ + self.root_folder + """
+        path_train_data: """ + self.path_train_data + """
+        path_test_data: """ + self.path_test_data + """
+        path_interaction_map: """ + self.path_interaction_map + """
+        
+        output_run_dir: """ + self.output_run_dir + """
+        tb_dir: """ + self.tb_dir + """
+        index_safe_path: """ + self.index_safe_path + """
+        timeline_profile_path: """ + self.timeline_profile_path + """
+        
+        Previous model dependence:
+        
+        previous_successful_output_run_dir: """ + self.previous_successful_output_run_dir + """
+        
         General parameters of the config:
         
-        fast run through: """ + str(self.short) + """
         epochs: """ + str(self.epochs) + """
+        embedding_size: """ + str(self.embedding_size) + """
         batch size: """ + str(self.batch_size) + """
         fake fraction: """ + str(self.fake_frac) + """
         bucket count: """ + str(self.bucket_count) + """
         learning rate: """ + str(self.learning_rate) + """
+        neighboring_interactions: """ + str(self.neighboring_interactions) + """
+        
+        Evaluation setup:
+        
+        events_from_true_data: """ + str(self.events_from_true_data) + """
+        knn_plots: """ + str(self.knn_plots) + """
+        result_cnt_plots: """ + str(self.result_cnt_plots) + """
+        knn_final: """ + str(self.knn_final) + """
+        result_cnt_final: """ + str(self.result_cnt_final) + """
         """
         return ret_string
