@@ -15,6 +15,8 @@ from core.trainer import Trainer
 
 
 def run(config):
+    tf.reset_default_graph()
+
     cf = config
     um = InteractionMapper(cf.path_interaction_map)
     if cf.continnue_previous_run:
@@ -91,9 +93,11 @@ def run(config):
             f.write(trainer.chrome_trace())
 
         tbw.flush()
+        sess.close()
 
     print("saving index...")
     ii.safe(cf.index_safe_path)
 
     Path(cf.output_run_dir + '/_SUCCESS').touch()
     print("success: _SUCCESS generated")
+

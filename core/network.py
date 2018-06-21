@@ -12,17 +12,27 @@ class Network:
 
     def _initialize_params_(self, preheated_embeddings=None):
         """preheated_embeddings should be a numpy array"""
-        rand_std = 0.01
+        rand_std = 1/self.cf.embedding_size
         num_categories = self.im.interaction_class_cnt
 
         if preheated_embeddings is not None:
-            cf_shape = np.array([num_categories, self.cf.embedding_size])
-            pre_shape = preheated_embeddings.shape
-            if not np.array_equal(cf_shape, pre_shape):
-                raise ValueError('preheated_embeddings, shape= ' + str(pre_shape) + ' has not the shape in the config, shape=' + str(cf_shape))
-            initial_embedding = tf.Variable(tf.constant(preheated_embeddings))
+
+            if not np.array_equal(self.cf.embedding_size, preheated_embeddings.shape[1]):
+                raise ValueError('preheated_embeddings embedding size does not match the embedding size: ' + str(self.cf.embedding_size))
+            if num_categories < len(preheated_embeddings):
+                raise ValueError('preheated_embeddings are larger than the network is constructed for, num_categories: ' + str(num_categories))
+
+            if num_categories > len(preheated_embeddings):
+                print("INFO: filling missing embedding vectors with a random normal distribution.")
+                missing_vector_cnt = num_categories - len(preheated_embeddings)
+                new_rand = np.array(np.random.randn(missing_vector_cnt, self.cf.embedding_size) * rand_std, dtype=np.float32)
+                initial_embedding = tf.Variable(tf.constant(np.concatenate((preheated_embeddings, new_rand), axis=0)))
+            else:
+                print("INFO: Using only the given embeddings.")
+                initial_embedding = tf.Variable(tf.constant(preheated_embeddings))
         else:
-            initial_embedding = tf.Variable(tf.random_normal([num_categories, self.cf.embedding_size], stddev=1/self.cf.embedding_size))
+            print("INFO: Generate random embeddings.")
+            initial_embedding = tf.Variable(tf.random_normal([num_categories, self.cf.embedding_size], stddev=rand_std))
 
         self.weights = {
             'w_embedding': initial_embedding,
