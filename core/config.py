@@ -48,7 +48,7 @@ class Config:
         self.knn_plots = 200  # nearest neighbor search for tensorboard plots (weighted_pos_avg)
         self.result_cnt_plots = 50  # weighted random interactions considered for weighted_pos_avg when plotting
         self.knn_final = 200  # nearest neighbor search explicit logging  after entire training
-        self.result_cnt_final = 200  # weighted random interactions considered for weighted_pos_avg for final log
+        self.result_cnt_final = 50  # weighted random interactions considered for weighted_pos_avg for final log
 
     def make_dirs(self):
         os.mkdir(self.output_run_dir)

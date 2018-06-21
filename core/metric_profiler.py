@@ -26,7 +26,7 @@ class MetricProfiler(object):
         metric_entries = []
 
         for cnt in range(interactions_considered_cnt):
-
+            print(str(cnt) + " of " + str(interactions_considered_cnt))
             random_interaction_idx = self.ld.random_generator.rvs(size=1)[0].feature_idx
             random_interaction_str = self.im.num_to_interaction(random_interaction_idx)
 
@@ -60,8 +60,9 @@ class MetricProfiler(object):
         weights = [r.weight for r in metric_res]
         weighted_pos_avg = sum(weighted_results) / (sum(weights) + 0.000000001)
 
-        self.tbw.log_scalar(weighted_pos_avg, x_label, tag="evaluation_metric: weighted_pos_avg k=" + str(self.cf.knn_plots) + ", res=" + str(self.cf.result_cnt_plots))
-
+        self.tbw.log_scalar(weighted_pos_avg, x_label,
+                            tag="evaluation_metric: weighted_pos_avg k=" + str(self.cf.knn_plots) + ", res=" + str(
+                                self.cf.result_cnt_plots))
 
     def log_results(self):
         metric_res = self.calc_metrics(self.cf.result_cnt_final, self.cf.knn_plots, self.cf.events_from_true_data)
@@ -96,5 +97,3 @@ class MetricProfiler(object):
 
         self.tbw.log_info(self.sess, log_str)
         print(log_str)
-
-

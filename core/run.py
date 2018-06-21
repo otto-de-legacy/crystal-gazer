@@ -1,18 +1,18 @@
 import time
-
-import tensorflow as tf
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import tensorflow as tf
+
 import core.loader as ld
-from core.config import Config
 from core.interaction_index import InteractionIndex
 from core.interaction_mapper import InteractionMapper
 from core.metric_profiler import MetricProfiler
 from core.network import Network
 from core.tensorboard_writer import TensorboardWriter
 from core.trainer import Trainer
-from pathlib import Path
+
 
 def run(config):
     cf = config
@@ -65,26 +65,35 @@ def run(config):
 
             if train_loader.new_epoch:
                 batch_x, batch_y, target_distance = test_loader.get_next_batch(cf.batch_size * 100, fake_factor=0)
+                print("epochs: " + str(train_loader.epoch_cnt))
+                print("trainer testing...")
                 tensorboard_log_entry = trainer.test(sess, batch_x, batch_y, target_distance)
-
                 tbw.add_test_summary(tensorboard_log_entry, x_label)
                 tbw.flush()
-                print("epochs: " + str(train_loader.epoch_cnt))
 
+                print("calculating embedding...")
                 embedding_vectors = trainer.get_interaction_embeddings(sess)
+                print("calculating average normalization...")
                 tbw.log_scalar(np.average(np.linalg.norm(embedding_vectors, axis=1)), x_label,
                                tag="evaluation_metric: average norm of embedding vectors (normalization condition will force it towards 1)")
+                print("building index...")
                 ii = InteractionIndex(um, embedding_vectors)
+                print("metric profiling...")
                 mp = MetricProfiler(cf, sess, tbw, train_loader, um, ii)
                 mp.log_plots(x_label)
                 # print(np.linalg.norm(trainer.get_interaction_embeddings(sess) - pd_df.values))
+                print("epoch done")
 
+        print("final logging...")
         mp.log_results()
+        print("write timeline profile...")
         with open(cf.timeline_profile_path, 'w') as f:
             f.write(trainer.chrome_trace())
 
         tbw.flush()
 
+    print("saving index...")
     ii.safe(cf.index_safe_path)
 
     Path(cf.output_run_dir + '/_SUCCESS').touch()
+    print("success: _SUCCESS generated")
