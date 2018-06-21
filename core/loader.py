@@ -64,13 +64,6 @@ class Loader(object):
         random_generator = DataSampler(xk, pk, bucket_count=self.cf.bucket_count)  #
         return random_generator, cnt_tot_events, cnt_uniqe_events
 
-    def _prepare_eventsOLD(self, text_content):
-        events = []
-        user_journeys = text_content.split("\n")
-        for str in user_journeys:
-            events = events + self._user_journey_to_events(str)
-        return np.array(events)
-
     def _update_processed_state(self, batch_size):
         if self.event_cnt % self.unique_train_event_cnt >= (self.event_cnt + batch_size) % self.unique_train_event_cnt:
             self.epoch_cnt += 1
@@ -135,9 +128,11 @@ class Loader(object):
         top_bucket_info = top_bucket_info + """----------------------------------------------------
             """
         for e in top_bucket["bucket_events"][0:20]:
-            top_bucket_info = top_bucket_info + "feature: " + self.im.num_to_interaction(e.feature_idx) + """
+            top_bucket_info = top_bucket_info + "feature: " + self.im.num_to_interaction(
+                e.feature_idx) + ", feature_idx: " + str(e.feature_idx) + + """
             """
-            top_bucket_info = top_bucket_info + "target: " + self.im.num_to_interaction(e.label_idx) + """
+            top_bucket_info = top_bucket_info + "target: " + self.im.num_to_interaction(
+                e.label_idx) + ", label_idx: " + str(e.label_idx) + """"
             """
             top_bucket_info = top_bucket_info + "occurence count: " + str(e.count) + """
             """
