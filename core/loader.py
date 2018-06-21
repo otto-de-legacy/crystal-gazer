@@ -12,7 +12,6 @@ class Loader(object):
         """will try to read ALL files in path!"""
         self.cf = config
         self.root_path = path
-        # self.data_urls = os.listdir(path)
         self.random_generator, self.tot_event_cnt, self.unique_train_event_cnt = self._prepare_events()
         self.im = interaction_mapper
         self.epoch_cnt = 0
