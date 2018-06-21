@@ -128,7 +128,7 @@ class Loader(object):
             """
         for e in top_bucket["bucket_events"][0:20]:
             top_bucket_info = top_bucket_info + "feature: " + self.im.num_to_interaction(
-                e.feature_idx) + ", feature_idx: " + str(e.feature_idx) + + """
+                e.feature_idx) + ", feature_idx: " + str(e.feature_idx) + """
             """
             top_bucket_info = top_bucket_info + "target: " + self.im.num_to_interaction(
                 e.label_idx) + ", label_idx: " + str(e.label_idx) + """"

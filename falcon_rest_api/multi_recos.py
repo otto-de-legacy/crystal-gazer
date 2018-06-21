@@ -12,22 +12,26 @@ sys.path.insert(0, os.getcwd() + '/../')
 
 from core.interaction_index import InteractionIndex
 from core.interaction_mapper import InteractionMapper
-from falcon_rest_api.config import Config
+from falcon_rest_api.multi_config import MultiConfig
 from falcon_rest_api.ewma import EWMA
 from falcon_rest_api.cnt import CNT
 
-cf = Config(["/home/chambroc/Desktop/run_2018_June_18_17:40:38/interaction_indexing/"])
-print("building map...")
-im = InteractionMapper(map_path=cf.interaction_map_url)
-print("building index...")
-pd_df = pd.read_csv(cf.interaction_vectors_url, header=None)
-for col in pd_df.columns:
-    pd_df[col] = pd_df[col].astype(float)
-ii = InteractionIndex(im,
-                      pd_df.values,
-                      method=cf.method,
-                      space=cf.space)
-print("...index ready")
+cf = MultiConfig([
+    "/home/chambroc/github-projects/crystal-gazer/output/run_2018_June_21_14:04:14/interaction_indexing",
+    "/home/chambroc/github-projects/crystal-gazer/output/run_2018_June_21_14:04:22/interaction_indexing",
+])
+print("building maps and indices......")
+iis = []
+for dir in cf.source_dirs:
+    print(dir)
+    im = InteractionMapper(map_path=dir)
+    print("...map ready")
+    pd_df = pd.read_csv(dir + "/interaction_index.txt", header=None)
+    for col in pd_df.columns:
+        pd_df[col] = pd_df[col].astype(float)
+    iis = iis + [InteractionIndex(im, pd_df.values, method=cf.method, space=cf.space)]
+    print("...index ready")
+
 ewma_dt = EWMA(100)
 ewma_frac = EWMA(10000)
 cnt = CNT()
@@ -39,13 +43,15 @@ class RecoResource(object):
 
         resp.status = falcon.HTTP_200
         request_url = req.get_param('url')
-        # k = int(req.get_param('k'))
-        result = ii.knn_interaction_query(request_url, k=150)
-        resp.media = {
-            'url': request_url,
-            'knn_urls': list(result[0]),
-            # 'knn_distances': str(result[2]),
-        }
+        k_val = int(req.get_param('k', default=10))
+        multi_results = [ii.knn_interaction_query(request_url, k=k_val) for ii in iis]
+
+        ret_dict = {'url': request_url,
+                    'sources': cf.source_dirs}
+        for idx, res in enumerate(multi_results):
+            ret_dict['knn_urls_' + str(idx)] = list(res[0])
+        resp.media = ret_dict
+
         dt = time.time() - t
         if dt > 0.05:
             bucket = np.array([0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float32)
@@ -65,6 +71,30 @@ class RecoResource(object):
         cnt.step(1)
 
 
+class JaccardResource(object):
+
+    def on_get(self, req, resp):
+        resp.status = falcon.HTTP_200
+        request_url = req.get_param('url')
+        k_val = int(req.get_param('k', default=10))
+
+        multi_results = [ii.knn_interaction_query(request_url, k=k_val) for ii in iis]
+
+        ret_dict = {'url': request_url,
+                    'sources': cf.source_dirs}
+
+        for i in range(len(multi_results)):
+            for j in range(i + 1, len(multi_results)):
+                a = set(multi_results[i][1])
+                b = set(multi_results[j][1])
+                union_len = len(a.union(a, b))
+                intersec_len = len(a.intersection(b))
+
+                ret_dict[str(i) + "vs" + str(j)] = 1 - intersec_len / union_len
+
+            resp.media = ret_dict
+
+
 class MetricsResource(object):
     def on_get(self, req, resp):
         """Handles GET requests"""
@@ -74,10 +104,10 @@ class MetricsResource(object):
             'average_last_100_request_duration_in_s': dt_avg,
             'total_calls': cnt.values,
             'perc_last_10000_below_50ms': float(ewma_frac(0)),
-            'perc_last_10000_below_10ms':  float(ewma_frac(1)),
-            'perc_last_10000_below_5ms':  float(ewma_frac(2)),
-            'perc_last_10000_below_1ms':   float(ewma_frac(3)),
-            'perc_last_10000_below_0.5ms':   float(ewma_frac(4))
+            'perc_last_10000_below_10ms': float(ewma_frac(1)),
+            'perc_last_10000_below_5ms': float(ewma_frac(2)),
+            'perc_last_10000_below_1ms': float(ewma_frac(3)),
+            'perc_last_10000_below_0.5ms': float(ewma_frac(4))
         }
 
 
@@ -106,4 +136,5 @@ app = falcon.API()
 # will handle all requests to the URL path
 app.add_route('/recos', RecoResource())
 app.add_route('/metrics', MetricsResource())
+app.add_route('/jaccard', JaccardResource())
 app.add_route('/whatwouldcarlsay', WhatWouldCarlSay())
