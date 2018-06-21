@@ -54,8 +54,8 @@ class TestLoader(TestCase):
         cf.bucket_count = 1
         loader = ld.Loader(cf, interaction_mapper, "./resources/train")
         found_events = loader.random_generator.data_buckets[0]
-        duplicate = False
+        identical_target = False
         for event in found_events:
             if event.feature_idx == event.label_idx:
-                duplicate = True
-        self.assertTrue(duplicate == False)
+                identical_target = True
+        self.assertTrue(identical_target == False)
