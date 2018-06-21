@@ -47,3 +47,15 @@ class TestLoader(TestCase):
         self.assertTrue(features.dense_shape == [3, 8], msg=("was: " + str(features.dense_shape)))
         self.assertTrue(labels.dense_shape == [3, 8], msg="was: " + str(labels.dense_shape))
         np.testing.assert_array_equal(dist_vals, [0, 0, 1], err_msg="wrong dist_vals: " + str(dist_vals))
+
+    def test__prepare_events(self):
+        cf.neighboring_interactions = 4
+        cf.fake_frac = 0
+        cf.bucket_count = 1
+        loader = ld.Loader(cf, interaction_mapper, "./resources/train")
+        found_events = loader.random_generator.data_buckets[0]
+        duplicate = False
+        for event in found_events:
+            if event.feature_idx == event.label_idx:
+                duplicate = True
+        self.assertTrue(duplicate == False)
