@@ -21,7 +21,7 @@ interaction_mapper.interaction_class_cnt = 8
 class TestLoader(TestCase):
 
     def test_user_journey_to_feature_target(self):
-        cf.neighboring_interactions = 2
+        cf.neighboring_interactions = 1
         np.random.seed(0)
         test_string = "1,2,3,3,4,5,6"
         loader = ld.Loader(cf, interaction_mapper, "./resources/train")
