@@ -21,8 +21,9 @@ interaction_mapper.interaction_class_cnt = 8
 class TestLoader(TestCase):
 
     def test_user_journey_to_feature_target(self):
+        cf.neighboring_interactions = 2
         np.random.seed(0)
-        test_string = "1,2,3,4,5,6"
+        test_string = "1,2,3,3,4,5,6"
         loader = ld.Loader(cf, interaction_mapper, "./resources/train")
         compare = [Event(1, 2),
                    Event(2, 3),
@@ -33,6 +34,7 @@ class TestLoader(TestCase):
         np.testing.assert_array_equal(compare, result, err_msg=str(compare) + "!=" + str(result))
 
     def test_prepare_events(self):
+        cf.neighboring_interactions = 1
         loader = ld.Loader(cf, interaction_mapper, "./resources/train")
         result = loader.unique_train_event_cnt
         self.assertTrue(507 == result, msg="507 !=" + str(result))
