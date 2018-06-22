@@ -107,6 +107,6 @@ app = falcon.API()
 
 # Resources are represented by long-lived class instances
 # will handle all requests to the URL path
-app.add_route('/recos', RecoResource())
+app.add_route('/reco', RecoResource())
 app.add_route('/metrics', MetricsResource())
 app.add_route('/whatwouldcarlsay', WhatWouldCarlSay())
