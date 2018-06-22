@@ -54,6 +54,8 @@ For the translation, we use a mapping, defined in the interaction_map file for e
 
 ## profiling
 Some performance metrics are plotted with Tensorboard.
+Below, the three subsequent runs can be seen, each time adding new data and new cathegories up to 1 million.
+The metrics include TODO: explain metrics. 
 
 ![tensorboard_example](doc/figures/tensorboard_example.png)
 
