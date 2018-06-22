@@ -1,4 +1,4 @@
-# recos.py
+# reco.py
 import os
 import sys
 import time
@@ -15,18 +15,20 @@ from core.interaction_mapper import InteractionMapper
 from falcon_rest_api.config import Config
 from falcon_rest_api.ewma import EWMA
 from falcon_rest_api.cnt import CNT
+from core.conditional_index import ConditionalIndex
 
-cf = Config(["/home/chambroc/Desktop/run_2018_June_18_17:40:38/interaction_indexing/"])
+cf = Config("/home/chambroc/Desktop/RecoResults/ThreeInARow/day3/interaction_indexing")
 print("building map...")
-im = InteractionMapper(map_path=cf.interaction_map_url)
-print("building index...")
-pd_df = pd.read_csv(cf.interaction_vectors_url, header=None)
+im = InteractionMapper(map_path=cf.source_dir)
+print("loading data...")
+pd_df = pd.read_csv(cf.source_dir + "/interaction_index.txt", header=None)
 for col in pd_df.columns:
     pd_df[col] = pd_df[col].astype(float)
-ii = InteractionIndex(im,
-                      pd_df.values,
-                      method=cf.method,
-                      space=cf.space)
+print("building conditional index...")
+search_index = ConditionalIndex(im, pd_df.values, lambda key: True if "suche" in key else False, method=cf.method, space=cf.space)
+print("building index full...")
+main_index = InteractionIndex(im, pd_df.values, method=cf.method, space=cf.space)
+
 print("...index ready")
 ewma_dt = EWMA(100)
 ewma_frac = EWMA(10000)
@@ -36,14 +38,15 @@ cnt = CNT()
 class RecoResource(object):
     def on_get(self, req, resp):
         t = time.time()
-
         resp.status = falcon.HTTP_200
         request_url = req.get_param('url')
         # k = int(req.get_param('k'))
-        result = ii.knn_interaction_query(request_url, k=150)
+        url_result = main_index.knn_interaction_query(request_url, k=150)[0]
+        search_result = search_index.knn_interaction_query(request_url, k=10)[0]
         resp.media = {
             'url': request_url,
-            'knn_urls': list(result[0]),
+            'knn_urls': list(url_result),
+            'search_result': list(search_result)
             # 'knn_distances': str(result[2]),
         }
         dt = time.time() - t

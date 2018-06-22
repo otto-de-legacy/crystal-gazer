@@ -1,4 +1,4 @@
-# recos.py
+# reco.py
 import os
 import random
 import sys
@@ -6,6 +6,7 @@ import time
 import numpy as np
 
 import falcon
+import operator
 import pandas as pd
 
 print(os.getcwd())
@@ -28,6 +29,7 @@ cf = MultiConfig([
     "/home/chambroc/Desktop/RecoResults/ThreeInARow/day2/interaction_indexing",
     "/home/chambroc/Desktop/RecoResults/ThreeInARow/day3/interaction_indexing",
     "/home/chambroc/Desktop/RecoResults/SingleDays/day1/interaction_indexing",
+    "/home/chambroc/Desktop/RecoResults/SingleDays/day2/interaction_indexing",
 ])
 print("building maps and indices......")
 iis = []
@@ -49,23 +51,31 @@ cnt = CNT()
 jaccard_cnt = CNT()
 tot_jaccard = CNT()
 
+
 class RecoResource(object):
     def on_get(self, req, resp):
         t = time.time()
-
         resp.status = falcon.HTTP_200
         request_url = req.get_param('url')
         k_val = int(req.get_param('k', default=10))
         multi_results = [ii.knn_interaction_query(request_url, k=k_val)[0] for ii in iis]
-
-        intersecting_results = list(set(multi_results[0]).intersection(*[set(res) for res in multi_results[1:len(multi_results)]]))
+        intersecting_results = list(
+            set(multi_results[0]).intersection(*[set(res) for res in multi_results[1:len(multi_results)]]))
+        union_res = set().union(*[set(s) for s in multi_results])
+        resulting_merge = dict()
+        for res in union_res:
+            resulting_merge[res] = 0
+            for q_res in multi_results:
+                if res in q_res:
+                    resulting_merge[res] = resulting_merge[res] + 1
+        resulting_merge_tups = sorted(resulting_merge.items(), key=operator.itemgetter(1), reverse=True)
         ret_dict = {'url': request_url,
                     'sources': cf.source_dirs,
-                    'intersecting_results': intersecting_results}
+                    'intersecting_results': intersecting_results,
+                    'weighted results': resulting_merge_tups}
         for idx, res in enumerate(multi_results):
             ret_dict['knn_urls_' + str(idx)] = list(res)
         resp.media = ret_dict
-
         # PROFILING FROM HERE:
         dt = time.time() - t
         if dt > 0.05:
@@ -89,15 +99,25 @@ class DrawRandomResource(object):
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_200
         k_val = int(req.get_param('k', default=10))
-
         random_url_idx = random.randint(0, num_classes)
         url_str = iis[0].im.num_to_interaction(random_url_idx)
-        multi_results = [ii.knn_idx_query(random_url_idx, k=k_val) for ii in iis]
-
+        multi_results = [ii.knn_idx_query(random_url_idx, k=k_val)[0] for ii in iis]
+        intersecting_results = list(
+            set(multi_results[0]).intersection(*[set(res) for res in multi_results[1:len(multi_results)]]))
+        union_res = set().union(*[set(s) for s in multi_results])
+        resulting_merge = dict()
+        for res in union_res:
+            resulting_merge[res] = 0
+            for q_res in multi_results:
+                if res in q_res:
+                    resulting_merge[res] = resulting_merge[res] + 1
+        resulting_merge_tups = sorted(resulting_merge.items(), key=operator.itemgetter(1), reverse=True)
         ret_dict = {'url': url_str,
-                    'sources': cf.source_dirs}
+                    'sources': cf.source_dirs,
+                    'intersecting_results': intersecting_results,
+                    'weighted results': resulting_merge_tups}
         for idx, res in enumerate(multi_results):
-            ret_dict['knn_urls_' + str(idx)] = list(res[0])
+            ret_dict['knn_urls_' + str(idx)] = list(res)
         resp.media = ret_dict
 
 
@@ -112,8 +132,8 @@ class JaccardResource(object):
         all_jaccard = np.array([])
         for i in range(len(multi_results)):
             for j in range(i + 1, len(multi_results)):
-                a = set(multi_results[i][1])
-                b = set(multi_results[j][1])
+                a = set(multi_results[i][0])
+                b = set(multi_results[j][0])
                 union_len = len(a.union(a, b))
                 intersec_len = len(a.intersection(b))
                 jd = 1 - intersec_len / union_len
@@ -123,6 +143,7 @@ class JaccardResource(object):
         tot_jaccard.step(all_jaccard)
         jaccard_cnt.step(1)
 
+
 class JaccardRandomResource(object):
     def on_get(self, req, resp):
 
@@ -131,7 +152,7 @@ class JaccardRandomResource(object):
 
         random_url_idx = random.randint(0, num_classes)
         url_str = iis[0].im.num_to_interaction(random_url_idx)
-        multi_results = [ii.knn_idx_query(random_url_idx, k=k_val)[1] for ii in iis]
+        multi_results = [ii.knn_idx_query(random_url_idx, k=k_val)[0] for ii in iis]
 
         ret_dict = {'url': url_str,
                     'sources': cf.source_dirs}
@@ -149,6 +170,7 @@ class JaccardRandomResource(object):
 
         tot_jaccard.step(all_jaccard)
         jaccard_cnt.step(1)
+
 
 class MetricsResource(object):
     def on_get(self, req, resp):
@@ -186,12 +208,8 @@ class WhatWouldCarlSay(object):
         }
 
 
-# falcon.API instances are callable WSGI apps
 app = falcon.API()
-
-# Resources are represented by long-lived class instances
-# will handle all requests to the URL path
-app.add_route('/recos', RecoResource())
+app.add_route('/reco', RecoResource())
 app.add_route('/randomreco', DrawRandomResource())
 app.add_route('/metrics', MetricsResource())
 app.add_route('/jaccard', JaccardResource())
