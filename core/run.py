@@ -16,9 +16,10 @@ from core.trainer import Trainer
 
 def run(config):
     tf.reset_default_graph()
-
     cf = config
     um = InteractionMapper(cf.path_interaction_map)
+    ii = None
+    mp = False
     if cf.continnue_previous_run:
         pd_df = pd.read_csv(cf.previous_successful_output_run_dir + "/interaction_indexing/interaction_index.txt",
                             header=None)
@@ -27,27 +28,21 @@ def run(config):
         network = Network(cf, um, preheated_embeddings=pd_df.values)
     else:
         network = Network(cf, um)
-
     train_loader = ld.Loader(cf, um, cf.path_train_data)
     test_loader = ld.Loader(cf, um, cf.path_test_data)
-
     trainer = Trainer(cf, network)
-    ii = None
-    mp = False
-    x_label = None
 
-    log_txt = "Config: " + cf.to_string() + "\n\n" + \
-              "Interaction mapper: " + um.to_string() + "\n\n" + \
-              "Train Loader @start: " + train_loader.to_string() + "\n\n" + \
-              "Test Loader @start: " + test_loader.to_string()
     cf.make_dirs()
     tbw = TensorboardWriter(cf)
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
+        log_txt = "Config: " + cf.to_string() + "\n\n" + \
+                  "Interaction mapper: " + um.to_string() + "\n\n" + \
+                  "Train Loader @start: " + train_loader.to_string() + "\n\n" + \
+                  "Test Loader @start: " + test_loader.to_string()
         tbw.log_info(sess, log_txt)
 
-        t0_seconds = time.time()
         while train_loader.epoch_cnt < cf.epochs:
             tb = time.time()
             batch_x, batch_y, target_distance = train_loader.get_next_batch(cf.batch_size)
@@ -83,7 +78,6 @@ def run(config):
                 print("metric profiling...")
                 mp = MetricProfiler(cf, sess, tbw, train_loader, um, ii)
                 mp.log_plots(x_label)
-                # print(np.linalg.norm(trainer.get_interaction_embeddings(sess) - pd_df.values))
                 print("epoch done")
 
         print("final logging...")
@@ -100,4 +94,3 @@ def run(config):
 
     Path(cf.output_run_dir + '/_SUCCESS').touch()
     print("success: _SUCCESS generated")
-
