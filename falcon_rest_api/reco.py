@@ -25,7 +25,12 @@ pd_df = pd.read_csv(cf.source_dir + "/interaction_index.txt", header=None)
 for col in pd_df.columns:
     pd_df[col] = pd_df[col].astype(float)
 print("building conditional index...")
-search_index = ConditionalIndex(im, pd_df.values, lambda key: True if "suche" in key else False, method=cf.method, space=cf.space)
+
+filter_funs = [
+    lambda key: True if "suche" in key else False
+]
+
+search_index = ConditionalIndex(im, pd_df.values, lambdas_of_key=filter_funs, method=cf.method, space=cf.space)
 print("building index full...")
 main_index = InteractionIndex(im, pd_df.values, method=cf.method, space=cf.space)
 
