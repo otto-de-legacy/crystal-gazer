@@ -1,5 +1,6 @@
 # reco.py
 import os
+import random
 import sys
 import time
 import numpy as np
@@ -27,32 +28,40 @@ for col in pd_df.columns:
 print("building conditional index...")
 
 filter_funs = [
-    lambda key: True if "suche" in key else False
+    lambda key: True if "suche" in key else False,
+    lambda key: True if "/p/" in key else False,
+    lambda key: False if ("suche" in key) or ("/p/" in key) else True,
 ]
 
-search_index = ConditionalIndex(im, pd_df.values, lambdas_of_key=filter_funs, method=cf.method, space=cf.space)
-print("building index full...")
-main_index = InteractionIndex(im, pd_df.values, method=cf.method, space=cf.space)
+multi_index = ConditionalIndex(im, pd_df.values, lambdas_of_key=filter_funs, method=cf.method, space=cf.space)
+# print("building index full...")
+# main_index = InteractionIndex(im, pd_df.values, method=cf.method, space=cf.space)
 
 print("...index ready")
 ewma_dt = EWMA(100)
 ewma_frac = EWMA(10000)
 cnt = CNT()
-
+num_classes = multi_index.im.interaction_class_cnt
 
 class RecoResource(object):
     def on_get(self, req, resp):
         t = time.time()
         resp.status = falcon.HTTP_200
-        request_url = req.get_param('url')
-        # k = int(req.get_param('k'))
-        url_result = main_index.knn_interaction_query(request_url, k=150)[0]
-        search_result = search_index.knn_interaction_query(request_url, k=10)[0]
+        request_url = req.get_param('url', default=None)
+        if request_url is None:
+            random_url_idx = random.randint(0, num_classes)
+            request_url = multi_index.im.num_to_interaction(random_url_idx)
+        k = int(req.get_param('k', default=100))
+        url_result = multi_index.knn_interaction_query(request_url, k=k)[0]
+        search_result = multi_index.knn_interaction_query(request_url, 0, k=k)[0]
+        product_result = multi_index.knn_interaction_query(request_url, 1, k=k)[0]
+        other_result = multi_index.knn_interaction_query(request_url, 2, k=k)[0]
         resp.media = {
             'url': request_url,
             'knn_urls': list(url_result),
-            'search_result': list(search_result)
-            # 'knn_distances': str(result[2]),
+            'search_result': list(search_result),
+            'product': list(product_result),
+            'other': list(other_result)
         }
         dt = time.time() - t
         if dt > 0.05:
@@ -67,7 +76,6 @@ class RecoResource(object):
             bucket = np.array([100.0, 100.0, 100.0, 100.0, 0.0], dtype=np.float32)
         else:
             bucket = np.array([100.0, 100.0, 100.0, 100.0, 100.0], dtype=np.float32)
-
         ewma_dt.step(dt)
         ewma_frac.step(bucket)
         cnt.step(1)
