@@ -1,4 +1,3 @@
-#POC recommender
 Proof of concept (POC) of a recommender of time series categorical data.
 We use Tensorboard and nmslib for visualization and nearest neighbor queries, respectively.
 
@@ -12,7 +11,7 @@ What is under the hood beside python standard libraries such as pandas, scipy, .
 
 Pull-requests are welcome.
 
-
+# training and testing
 ## prior data preparation
 Prepare data with integer numbers as in test/train_data_small which is used as input.
 Each line is one unser interaction history ordered w.r.t. time (see attached data), e.g.:
@@ -52,7 +51,7 @@ For the translation, we use a mapping, defined in the interaction_map file for e
 
 
 
-## profiling
+## profiling and evaluation
 Some performance metrics are plotted with Tensorboard.
 Below, the three subsequent runs can be seen, each time adding new data and new cathegories up to 1 million.
 The metrics include TODO: explain metrics. 
@@ -65,11 +64,15 @@ The (final) json file produced can be viewed via a chrome browser:
 ![json_profiling_example](doc/figures/json_profiling.png)
 
 
-# REST API (WIP)
+# rest-api falcon
+The reco rest api for a single recommender (conditional) index 
+is shown as example:
+![tensorboard_example](doc/figures/falcon_reco_example.png)
+The metrics endpoint is shown in the profiling section below.
 
 ## starting
-use gunicorn in virtual environment (see environment.yml)
-
+We use gunicorn in the virtual environment (see environment.yml)
+to start the server.
 Start server (set timeout to let it create the index):
 ```bash
     gunicorn recos:app --timeout=1500
@@ -98,15 +101,7 @@ Percentage of the requests served within a certain time (ms)
   99%      8
  100%     26 (longest request)
 ```
-The internal nmslib call was:
-```bash
-average_last_100_request_duration_in_s	0.0003814718827198475
-total_calls	1000006
-perc_last_10000_below_50ms	99.98967742919922
-perc_last_10000_below_10ms	99.98967742919922
-perc_last_10000_below_5ms	99.98967742919922
-perc_last_10000_below_1ms	99.87962341308594
-perc_last_10000_below_0.5ms	98.5627670288086
-```
+The internal nmslib call was (shown in the metrics endpoint):
+![tensorboard_example](doc/figures/falcon_reco_profiling_example.png)
 
 Carl says that's ok.
