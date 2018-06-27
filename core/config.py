@@ -40,6 +40,7 @@ class Config:
         self.batch_size = 100000  # number of events processed in single step in tensorflow
         self.fake_frac = 0.7  # fraction of generated fake events for triplet loss
         self.bucket_count = 10  # buckets of the self-made event randomizer
+        self.bucket_sampling_type = "sigmoid"  # can be "sigmoid" or "default", default is sampling by count, sigmoid is samling by sigmoid of count to suppress often occuring events
         self.neighboring_interactions = 10  # distance of user_interactions still considered
         self.learning_rate = 0.001  # learning rate for tensorflow
 
