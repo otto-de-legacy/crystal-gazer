@@ -1,4 +1,5 @@
 import glob
+import math
 import random
 
 import numpy as np
@@ -37,6 +38,7 @@ class Loader(object):
         return events
 
     def _prepare_events(self):
+        """generating all events and defining the data_sampler"""
         events = dict()
         cnt_tot_events = 0
         cnt_uniqe_events = 0
@@ -58,22 +60,32 @@ class Loader(object):
         xk = list(events.keys())
         for e, cnt in zip(events, events.values()):  # TODO: make this nicer by aggregation and sum elements
             e.count = cnt
-        pk = list(np.array(list(events.values())) / cnt_tot_events)
+
+        if self.cf.bucket_sampling_type is "sigmoid":
+            pk = list(map(lambda x: 1 / (1 + math.exp(-x)) - 1/2, np.array(list(events.values()))))
+            pk = np.array(pk) / sum(pk)
+        else:
+            pk = list(np.array(list(events.values())) / cnt_tot_events)
 
         random_generator = DataSampler(xk, pk, bucket_count=self.cf.bucket_count)  #
         return random_generator, cnt_tot_events, cnt_uniqe_events
 
+
     def _update_processed_state(self, batch_size):
+        """update metainformation for processing"""
         if self.event_cnt % self.unique_train_event_cnt >= (self.event_cnt + batch_size) % self.unique_train_event_cnt:
             self.epoch_cnt += 1
             self.new_epoch = True
         self.batch_cnt += 1
         self.event_cnt += batch_size
 
+
     def get_random_events(self, size):
         return self.random_generator.rvs(size=size)
 
+
     def get_next_batch(self, batch_size, fake_factor=None):
+        """draw random batch according to random_sampler and fake events for triplet loss"""
         if fake_factor is None:
             fake_factor = self.cf.fake_frac
 
@@ -100,21 +112,24 @@ class Loader(object):
         self._update_processed_state(eff_batch_size)
         return features, labels, target_distance
 
+
     def get_all_data(self):
-        return self.get_next_batch(self.unique_train_event_cnt)
+        """return all events"""
+        return self.random_generator.get_by_condition()
+
 
     def to_string(self):
         ret_string = """
-        General parameters of the loader:
-        
-        events considered in total: """ + str(self.tot_event_cnt) + """
-        unique train events: """ + str(self.unique_train_event_cnt) + """
-        epochs processed: """ + str(self.epoch_cnt) + """
-        batches processed: """ + str(self.batch_cnt) + """
-        events processed: """ + str(self.event_cnt) + """
-        
-        
-        """ + self.random_generator.to_string() + """\n\ntop bucket: \n\n"""
+            General parameters of the loader:
+            
+            events considered in total: """ + str(self.tot_event_cnt) + """
+            unique train events: """ + str(self.unique_train_event_cnt) + """
+            epochs processed: """ + str(self.epoch_cnt) + """
+            batches processed: """ + str(self.batch_cnt) + """
+            events processed: """ + str(self.event_cnt) + """
+            
+            
+            """ + self.random_generator.to_string() + """\n\ntop bucket: \n\n"""
 
         top_bucket_info = ""
         top_bucket = self.random_generator.get_top_bucket()
@@ -125,17 +140,17 @@ class Loader(object):
 
         top_bucket_info = top_bucket_info + "avg event occurence: " + str(avg_occurence_per_top_event) + "\n\n"
         top_bucket_info = top_bucket_info + """----------------------------------------------------
-            """
+                """
         for e in top_bucket["bucket_events"][0:20]:
             top_bucket_info = top_bucket_info + "feature: " + self.im.num_to_interaction(
                 e.feature_idx) + ", feature_idx: " + str(e.feature_idx) + """
-            """
+                """
             top_bucket_info = top_bucket_info + "target: " + self.im.num_to_interaction(
                 e.label_idx) + ", label_idx: " + str(e.label_idx) + """"
-            """
+                """
             top_bucket_info = top_bucket_info + "occurence count: " + str(e.count) + """
-            """
+                """
             top_bucket_info = top_bucket_info + """----------------------------------------------------
-            """
+                """
 
         return ret_string + top_bucket_info
