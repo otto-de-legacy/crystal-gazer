@@ -8,7 +8,7 @@ from core.interaction_mapper import InteractionMapper
 class TestInteractionMapper(TestCase):
     def test_constructor(self):
         im = InteractionMapper('./resources/map')
-        expected = 8
+        expected = 50
         self.assertTrue(im.interaction_class_cnt == expected,
                         msg=str(im.interaction_class_cnt) + "!=" + str(expected))
 
