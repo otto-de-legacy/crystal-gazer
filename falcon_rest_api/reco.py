@@ -17,10 +17,9 @@ from falcon_rest_api.config import Config
 from falcon_rest_api.ewma import EWMA
 from falcon_rest_api.cnt import CNT
 from core.conditional_index import ConditionalIndex
+import falcon_rest_api.machine_metrics as met
 
 cf = Config("/home/chambroc/Desktop/RecoResults/ThreeInARow/day3/interaction_indexing")
-print("building map...")
-im = InteractionMapper(map_path=cf.source_dir)
 print("loading data...")
 pd_df = pd.read_csv(cf.source_dir + "/interaction_index.txt", header=None)
 for col in pd_df.columns:
@@ -28,12 +27,17 @@ for col in pd_df.columns:
 print("building conditional index...")
 
 filter_funs = [
-    lambda key: True if "suche" in key else False,
-    lambda key: True if "/p/" in key else False,
-    lambda key: False if ("suche" in key) or ("/p/" in key) else True,
+    # lambda key: True if "suche" in key else False,
+    # lambda key: True if "/p/" in key else False,
+    # lambda key: False if ("suche" in key) or ("/p/" in key) else True,
 ]
 
-multi_index = ConditionalIndex(im, pd_df.values, lambdas_of_key=filter_funs, method=cf.method, space=cf.space)
+multi_index = ConditionalIndex(
+    InteractionMapper(map_path=cf.source_dir),
+    pd_df.values,
+    lambdas_of_key=filter_funs,
+    method=cf.method,
+    space=cf.space)
 # print("building index full...")
 # main_index = InteractionIndex(im, pd_df.values, method=cf.method, space=cf.space)
 
@@ -53,15 +57,15 @@ class RecoResource(object):
             request_url = multi_index.im.num_to_interaction(random_url_idx)
         k = int(req.get_param('k', default=100))
         url_result = multi_index.knn_interaction_query(request_url, k=k)[0]
-        search_result = multi_index.knn_interaction_query(request_url, 0, k=k)[0]
-        product_result = multi_index.knn_interaction_query(request_url, 1, k=k)[0]
-        other_result = multi_index.knn_interaction_query(request_url, 2, k=k)[0]
+        # search_result = multi_index.knn_interaction_query(request_url, 0, k=k)[0]
+        # product_result = multi_index.knn_interaction_query(request_url, 1, k=k)[0]
+        # other_result = multi_index.knn_interaction_query(request_url, 2, k=k)[0]
         resp.media = {
             'url': request_url,
             'knn_urls': list(url_result),
-            'search_result': list(search_result),
-            'product': list(product_result),
-            'other': list(other_result)
+            # 'search_result': list(search_result),
+            # 'product': list(product_result),
+            # 'other': list(other_result)
         }
         dt = time.time() - t
         if dt > 0.05:
@@ -86,9 +90,18 @@ class MetricsResource(object):
         """Handles GET requests"""
         resp.status = falcon.HTTP_200
         dt_avg = ewma_dt.values
+
+
+
         resp.media = {
+            'num_classes': num_classes,
+            'embedding_matrix_size': (multi_index.tot_object_cnt, multi_index.vector_size),
+            'space': cf.space,
+            'method': cf.method,
             'average_last_100_request_duration_in_s': dt_avg,
             'total_calls': cnt.values,
+            'mem_usage_mb': met.memory_usage_psutil(),
+            'cpu_usage_perc': met.cpu_usage_percent(),
             'perc_last_10000_below_50ms': float(ewma_frac(0)),
             'perc_last_10000_below_10ms':  float(ewma_frac(1)),
             'perc_last_10000_below_5ms':  float(ewma_frac(2)),

@@ -16,6 +16,8 @@ class ConditionalIndex(object):
         self.im = interaction_mapper
         self.build_full_index = build_full_index
         self.interaction_vectors = interaction_vectors
+        self.vector_size = len(interaction_vectors[0])
+        self.tot_object_cnt = len(interaction_vectors)
 
         conditional_vectors = [[] for _ in range(len(lambdas_of_key))]
         self.conditional_remappings = [dict() for _ in range(len(lambdas_of_key))] #* len(lambdas_of_key)

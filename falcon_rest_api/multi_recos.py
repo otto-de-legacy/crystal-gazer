@@ -25,12 +25,15 @@ from falcon_rest_api.cnt import CNT
 # print(process.memory_info().rss)
 
 cf = MultiConfig([
-    "/home/chambroc/Desktop/RecoResults/ThreeInARow/day1/interaction_indexing",
-    "/home/chambroc/Desktop/RecoResults/ThreeInARow/day2/interaction_indexing",
-    "/home/chambroc/Desktop/RecoResults/ThreeInARow/day3/interaction_indexing",
+    # "/home/chambroc/Desktop/RecoResults/ThreeInARow/day1/interaction_indexing",
+    # "/home/chambroc/Desktop/RecoResults/ThreeInARow/day2/interaction_indexing",
+    # "/home/chambroc/Desktop/RecoResults/ThreeInARow/day3/interaction_indexing",
     "/home/chambroc/Desktop/RecoResults/ThreeInARowPlus/day1/interaction_indexing",
     "/home/chambroc/Desktop/RecoResults/ThreeInARowPlus/day2/interaction_indexing",
     "/home/chambroc/Desktop/RecoResults/ThreeInARowPlus/day3/interaction_indexing",
+    "/home/chambroc/Desktop/RecoResults/ThreeInARowMoreEvents/day1/interaction_indexing",
+    "/home/chambroc/Desktop/RecoResults/ThreeInARowMoreEvents/day2/interaction_indexing",
+    "/home/chambroc/Desktop/RecoResults/ThreeInARowMoreEvents/day3/interaction_indexing",
 ])
 print("building maps and indices......")
 iis = []
