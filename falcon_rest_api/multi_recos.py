@@ -28,8 +28,9 @@ cf = MultiConfig([
     "/home/chambroc/Desktop/RecoResults/ThreeInARow/day1/interaction_indexing",
     "/home/chambroc/Desktop/RecoResults/ThreeInARow/day2/interaction_indexing",
     "/home/chambroc/Desktop/RecoResults/ThreeInARow/day3/interaction_indexing",
-    "/home/chambroc/Desktop/RecoResults/SingleDays/day1/interaction_indexing",
-    "/home/chambroc/Desktop/RecoResults/SingleDays/day2/interaction_indexing",
+    "/home/chambroc/Desktop/RecoResults/ThreeInARowPlus/day1/interaction_indexing",
+    "/home/chambroc/Desktop/RecoResults/ThreeInARowPlus/day2/interaction_indexing",
+    "/home/chambroc/Desktop/RecoResults/ThreeInARowPlus/day3/interaction_indexing",
 ])
 print("building maps and indices......")
 iis = []
