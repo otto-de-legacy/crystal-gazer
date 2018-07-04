@@ -19,7 +19,8 @@ from falcon_rest_api.cnt import CNT
 from core.conditional_index import ConditionalIndex
 import falcon_rest_api.machine_metrics as met
 
-cf = Config("/home/chambroc/Desktop/RecoResults/ThreeInARow/day3/interaction_indexing")
+cf = Config("/home/chambroc/Desktop/RecoResults/ThreeInARowMoreEvents/day3/interaction_indexing")
+cf.method = "hnsw"
 print("loading data...")
 pd_df = pd.read_csv(cf.source_dir + "/interaction_index.txt", header=None)
 for col in pd_df.columns:
@@ -27,9 +28,9 @@ for col in pd_df.columns:
 print("building conditional index...")
 
 filter_funs = [
-    # lambda key: True if "suche" in key else False,
-    # lambda key: True if "/p/" in key else False,
-    # lambda key: False if ("suche" in key) or ("/p/" in key) else True,
+    lambda key: True if "suche" in key else False,
+    lambda key: True if "/p/" in key else False,
+    lambda key: False if ("suche" in key) or ("/p/" in key) else True,
 ]
 
 multi_index = ConditionalIndex(
@@ -57,15 +58,15 @@ class RecoResource(object):
             request_url = multi_index.im.num_to_interaction(random_url_idx)
         k = int(req.get_param('k', default=100))
         url_result = multi_index.knn_interaction_query(request_url, k=k)[0]
-        # search_result = multi_index.knn_interaction_query(request_url, 0, k=k)[0]
-        # product_result = multi_index.knn_interaction_query(request_url, 1, k=k)[0]
-        # other_result = multi_index.knn_interaction_query(request_url, 2, k=k)[0]
+        search_result = multi_index.knn_interaction_query(request_url, 0, k=k)[0]
+        product_result = multi_index.knn_interaction_query(request_url, 1, k=k)[0]
+        other_result = multi_index.knn_interaction_query(request_url, 2, k=k)[0]
         resp.media = {
             'url': request_url,
             'knn_urls': list(url_result),
-            # 'search_result': list(search_result),
-            # 'product': list(product_result),
-            # 'other': list(other_result)
+            'search_result': list(search_result),
+            'product': list(product_result),
+            'other': list(other_result)
         }
         dt = time.time() - t
         if dt > 0.05:
@@ -92,6 +93,17 @@ class MetricsResource(object):
         dt_avg = ewma_dt.values
 
 
+        dt_avg_in_s = ewma_dt.values
+        perc_dt_50 = float(ewma_frac(0))
+        perc_dt_10 = float(ewma_frac(1))
+        if dt_avg_in_s is None:
+            statement = "no traffic means, it's fast enough"
+        elif dt_avg_in_s * 1000 < 5 and perc_dt_50 > 99.99 and perc_dt_10 > 99.8:
+            statement = "excellent job"
+        elif dt_avg_in_s * 1000 < 10 and perc_dt_50 > 99.8:
+            statement = "you need to drill deeper \n - thats what she said"
+        else:
+            statement = "your mama is faster than this"
 
         resp.media = {
             'num_classes': num_classes,
@@ -106,7 +118,8 @@ class MetricsResource(object):
             'perc_last_10000_below_10ms':  float(ewma_frac(1)),
             'perc_last_10000_below_5ms':  float(ewma_frac(2)),
             'perc_last_10000_below_1ms':   float(ewma_frac(3)),
-            'perc_last_10000_below_0.5ms':   float(ewma_frac(4))
+            'perc_last_10000_below_0.5ms':   float(ewma_frac(4)),
+            'what_would_carl_say':   statement
         }
 
 
