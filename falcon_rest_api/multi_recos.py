@@ -28,10 +28,10 @@ cf = MultiConfig([
     # "/home/chambroc/Desktop/RecoResults/ThreeInARow/day1/interaction_indexing",
     # "/home/chambroc/Desktop/RecoResults/ThreeInARow/day2/interaction_indexing",
     # "/home/chambroc/Desktop/RecoResults/ThreeInARow/day3/interaction_indexing",
-    "/home/chambroc/Desktop/RecoResults/ThreeInARow120/day1/interaction_indexing",
+    # "/home/chambroc/Desktop/RecoResults/ThreeInARow120/day1/interaction_indexing",
     "/home/chambroc/Desktop/RecoResults/ThreeInARow120/day2/interaction_indexing",
     "/home/chambroc/Desktop/RecoResults/ThreeInARow120/day3/interaction_indexing",
-    "/home/chambroc/Desktop/RecoResults/ThreeInARowMoreEvents/day1/interaction_indexing",
+    # "/home/chambroc/Desktop/RecoResults/ThreeInARowMoreEvents/day1/interaction_indexing",
     "/home/chambroc/Desktop/RecoResults/ThreeInARowMoreEvents/day2/interaction_indexing",
     "/home/chambroc/Desktop/RecoResults/ThreeInARowMoreEvents/day3/interaction_indexing",
 ])
@@ -213,10 +213,10 @@ class WhatWouldCarlSay(object):
         }
 
 
-app = falcon.API()
-app.add_route('/reco', RecoResource())
-app.add_route('/randomreco', DrawRandomResource())
-app.add_route('/metrics', MetricsResource())
-app.add_route('/jaccard', JaccardResource())
-app.add_route('/randomjaccard', JaccardRandomResource())
-app.add_route('/whatwouldcarlsay', WhatWouldCarlSay())
+application = falcon.API()
+application.add_route('/reco', RecoResource())
+application.add_route('/randomreco', DrawRandomResource())
+application.add_route('/metrics', MetricsResource())
+application.add_route('/jaccard', JaccardResource())
+application.add_route('/randomjaccard', JaccardRandomResource())
+application.add_route('/whatwouldcarlsay', WhatWouldCarlSay())

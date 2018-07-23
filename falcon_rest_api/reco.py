@@ -142,10 +142,10 @@ class WhatWouldCarlSay(object):
 
 
 # falcon.API instances are callable WSGI apps
-app = falcon.API()
+application = falcon.API()
 
 # Resources are represented by long-lived class instances
 # will handle all requests to the URL path
-app.add_route('/reco', RecoResource())
-app.add_route('/metrics', MetricsResource())
-app.add_route('/whatwouldcarlsay', WhatWouldCarlSay())
+application.add_route('/reco', RecoResource())
+application.add_route('/metrics', MetricsResource())
+application.add_route('/whatwouldcarlsay', WhatWouldCarlSay())
