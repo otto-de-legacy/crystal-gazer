@@ -91,7 +91,7 @@ We use gunicorn in the virtual environment (see environment.yml)
 to start the server.
 Start server (set timeout to let it create the index):
 ```bash
-    gunicorn recos:app --timeout=1500
+    gunicorn reco:application --timeout=1500
 ```    
 ## profiling
 install:
